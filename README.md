@@ -2,7 +2,7 @@
 
 > **English summary.** Dual-mode tender & bid drafting engine for DeepSeek Harness. Registers **21 directly callable `mont_*` tools** with code-enforced compliance (T-B1–T-B5), a fact-source allowlist, three human gates backed by a tamper-evident audit chain, score-aligned outlining, dual-threshold similarity checks, and pure-JS `.docx` export. No network access, no subprocesses, no credentials, no install-time scripts. See [SECURITY.md](SECURITY.md) for the full permission table.
 
-招投标双模辅助编制引擎，DeepSeek Harness（DSH）插件。
+mont-BidCopilot 是招投标双模辅助编制引擎，DeepSeek Harness（DSH）插件。插件在 DSH 界面显示的名字就是 `mont-BidCopilot`，不使用中文别名。
 
 > **它与「技能包」不是一类东西。** 本插件通过 `ctx.tools.register` 注册 **21 个 `mont_*` 真工具**，模型可直接调用；不依赖先加载技能正文再自行拼流程。作为对照，同目录的 `mont-forge` 是 44 个 `SKILL.md` 的技能包，其 `index.js` 只调 `ctx.skills.registerProvider`，没有 `ctx.tools.register`，因此那 44 项不是可自动调用的工具。
 
@@ -62,7 +62,7 @@ plugin_manager install_bundle target: F:\DSHDesktop\chajian\mont-BidCopilot
 1. 打开 DSH 左侧栏 **Plugins**（插件）；
 2. 点 **Add plugin**（添加插件）；
 3. 选择本地目录 `F:\DSHDesktop\chajian\mont-BidCopilot`；
-4. 安装后确认插件行出现「招投标双模辅助编制」，图标为蓝底文档 + 绿色勾；
+4. 安装后确认插件行出现「mont-BidCopilot」，图标为蓝底文档 + 绿色勾；
 5. 如果状态提示需要重启，重启 DSH。
 
 安装后可在插件详情页看到中英文标题、描述、权限说明和示意图（`locale/en.json`、`locale/zh.json`、`docs/DETAIL.md`）。

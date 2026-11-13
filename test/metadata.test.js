@@ -188,6 +188,29 @@ test('文档｜内部实施方案文档不得进入仓库与 npm 包', () => {
   }
 })
 
+test('元数据｜插件显示名统一为英文 mont-BidCopilot，不用中文别名', () => {
+  // 插件在 Plugin Manager 里显示的名字来自 locale 的 meta.title。
+  for (const file of ['locale/en.json', 'locale/zh.json']) {
+    const title = JSON.parse(read(file)).meta.title
+    assert.equal(title, 'mont-BidCopilot', `${file} 的 meta.title 应为 mont-BidCopilot，实际 ${title}`)
+
+    // 标题里不得出现汉字（无论哪个 locale，显示名都统一为英文）
+    const hanCount = (title.match(/\p{Script=Han}/gu) ?? []).length
+    assert.equal(hanCount, 0, `${file} 的标题含汉字 ${hanCount} 个`)
+  }
+
+  // 安装文档里让用户核对的名字也必须是英文
+  const readme = read('README.md')
+  assert.ok(
+    readme.includes('插件行出现「mont-BidCopilot」'),
+    '安装步骤中的核对名称应为 mont-BidCopilot',
+  )
+
+  // 详情文档的替代文本首词应带插件名
+  const detailZh = read('docs/DETAIL.zh.md')
+  assert.ok(detailZh.includes('mont-BidCopilot'), '中文详情文档的替代文本应含插件名')
+})
+
 test('元数据｜package.json 声明 repository 与 homepage（供 npm 与插件市场解析来源）', () => {
   const pkg = JSON.parse(read('package.json'))
   assert.match(pkg.repository?.url ?? '', /^git\+https:\/\/github\.com\/royrao2007\/mont-BidCopilot\.git$/u)
