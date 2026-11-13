@@ -159,6 +159,35 @@ test('元数据｜LICENSE 为纯 MIT 文本（GitHub 才能识别为 MIT）', ()
   }
 })
 
+test('文档｜内部实施方案文档不得进入仓库与 npm 包', () => {
+  const internalDoc = 'mont-BidCopilot实施方案.md'
+
+  // .gitignore 必须拦住它，否则会被 git add -A 再次带进仓库。
+  const gitignore = read('.gitignore')
+  assert.ok(
+    gitignore.includes(internalDoc),
+    '.gitignore 须忽略内部实施方案文档，防止再次误提交',
+  )
+
+  // package.json 的 files 不得包含它。
+  const pkg = JSON.parse(read('package.json'))
+  assert.equal(
+    pkg.files.some(entry => entry.includes('实施方案')),
+    false,
+    'package.json#files 不得包含内部实施方案文档',
+  )
+
+  // 已跟踪文件里不得引用该文档（否则读者在仓库里查不到）。
+  const trackedTexts = ['CHANGELOG.md', 'README.md', 'SECURITY.md', 'NOTICE.md']
+  for (const file of trackedTexts) {
+    assert.equal(
+      read(file).includes(`${internalDoc}`),
+      false,
+      `${file} 不应引用不在仓库内的 ${internalDoc}`,
+    )
+  }
+})
+
 test('元数据｜package.json 声明 repository 与 homepage（供 npm 与插件市场解析来源）', () => {
   const pkg = JSON.parse(read('package.json'))
   assert.match(pkg.repository?.url ?? '', /^git\+https:\/\/github\.com\/royrao2007\/mont-BidCopilot\.git$/u)

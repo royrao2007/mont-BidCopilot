@@ -2,6 +2,9 @@
 # 不属于包内容（package.json#files 不含 node_modules），也不应提交。
 node_modules/
 
+# 内部实施方案文档：仅本地留存，不进仓库也不进 npm 包。
+mont-BidCopilot实施方案.md
+
 # 测试与调试产物
 *.tmp
 *.log
