@@ -40,3 +40,31 @@ Apache-2.0 §4 要求：分发衍生作品须附许可证副本（见 `LICENSE` 
 - 法规条文原文属公有领域；
 - 行业骨架结构来自 Apache-2.0 的 BiaoShu-SKILL，已按 §2 处理；
 - 检查项名称与判定口径为本包自行归纳，不复制任何 AGPL 组件的表达。
+
+## 6. 完整许可证原文位置
+
+- 本包自身的 MIT 全文见 `LICENSE`。
+- 各上游组件的许可证全文请到其仓库根目录的 `LICENSE` 获取（第 1—3 节已列出仓库地址）。
+- 按 MIT 与 Apache-2.0 的要求，下列原始版权行在此保留：
+
+```
+MIT License — dsh-plugin-bidkit
+Copyright (c) 2026 BidKit contributors
+
+MIT License — dsh-company-kb
+Copyright (c) 2026 wu81313-lab
+
+MIT License — dsh-gatedflow
+Copyright (c) 2026 TtTRz
+
+MIT License — rejection-check（废标项检查工具）
+Copyright (c) 2026 废标项检查工具
+
+Apache License 2.0 — BiaoShu-SKILL
+Copyright Get00 and BiaoShu-SKILL contributors
+
+Apache License 2.0 — BidCopilot
+Copyright xrzlizheng and BidCopilot contributors
+```
+
+`LICENSE` 文件只保留本包自身的 MIT 文本，以便 GitHub 与 npm 正确识别许可证类型；上游声明集中在本文件，这是 MIT 与 Apache-2.0 允许的常见做法。

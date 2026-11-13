@@ -134,6 +134,38 @@ test('元数据｜清单导出并打包了 locale、icon、docs', () => {
   }
 })
 
+test('元数据｜LICENSE 为纯 MIT 文本（GitHub 才能识别为 MIT）', () => {
+  const license = read('LICENSE')
+  assert.ok(license.trimStart().startsWith('MIT License'), 'LICENSE 首行应为 MIT License')
+  assert.ok(license.includes('Permission is hereby granted, free of charge'), '缺 MIT 授权段')
+  assert.ok(license.includes('THE SOFTWARE IS PROVIDED "AS IS"'), '缺 MIT 免责段')
+
+  // 附加内容会让 GitHub 的 license 检测退化为「other」。
+  assert.equal(
+    /^-{3,}$/mu.test(license),
+    false,
+    'LICENSE 不得包含分隔线后的附加声明，上游归因应放在 NOTICE.md',
+  )
+  assert.equal(
+    /Apache License/u.test(license),
+    false,
+    'LICENSE 不得混入 Apache-2.0 文本；上游声明放 NOTICE.md',
+  )
+
+  // 上游版权行必须仍被保留在某处（MIT/Apache-2.0 的强制要求）。
+  const notice = read('NOTICE.md')
+  for (const holder of ['BidKit contributors', 'wu81313-lab', 'TtTRz', 'BiaoShu-SKILL']) {
+    assert.ok(notice.includes(holder), `NOTICE.md 未保留上游版权行：${holder}`)
+  }
+})
+
+test('元数据｜package.json 声明 repository 与 homepage（供 npm 与插件市场解析来源）', () => {
+  const pkg = JSON.parse(read('package.json'))
+  assert.match(pkg.repository?.url ?? '', /^git\+https:\/\/github\.com\/royrao2007\/mont-BidCopilot\.git$/u)
+  assert.equal(pkg.homepage, 'https://github.com/royrao2007/mont-BidCopilot')
+  assert.equal(pkg.author?.url, 'https://github.com/royrao2007')
+})
+
 test('元数据｜package.json 保持零依赖、无安装期脚本、声明 engines.dsh', () => {
   const pkg = JSON.parse(read('package.json'))
   assert.deepEqual(Object.keys(pkg.dependencies ?? {}), [], '运行时依赖必须为空')
