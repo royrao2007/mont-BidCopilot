@@ -1,0 +1,66 @@
+{
+  "name": "dsh-mont-bidcopilot",
+  "version": "0.1.0",
+  "description": "Dual-mode tender and bid drafting engine for DeepSeek Harness. Registers 21 directly callable mont_* tools with code-enforced compliance rules (T-B1 to T-B5), a fact-source allowlist, three human gates with a tamper-evident audit chain, score-aligned outlining, dual-threshold similarity checks, and pure-JS .docx export. No network access, no subprocesses, no install-time scripts.",
+  "license": "MIT",
+  "author": {
+    "name": "mont"
+  },
+  "type": "module",
+  "main": "index.js",
+  "icon": "./icon.svg",
+  "engines": {
+    "node": ">=22.5.0",
+    "dsh": ">=0.2.2-rc.1"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json",
+    "./icon": "./icon.svg",
+    "./locale/*.json": "./locale/*.json",
+    "./lib/*": "./lib/*"
+  },
+  "files": [
+    "index.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale/*.json",
+    "docs",
+    "lib",
+    "data",
+    "LICENSE",
+    "NOTICE.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "pack:check": "npm pack --dry-run"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "tender",
+    "bidding",
+    "procurement",
+    "compliance",
+    "audit-trail",
+    "docx",
+    "chinese"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.1 <5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  }
+}

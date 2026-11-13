@@ -1,0 +1,107 @@
+{
+  "version": "1.0.0",
+  "detection": {
+    "enabled": true,
+    "method": "keyword_matching",
+    "confidence_threshold": 0.3,
+    "fallback_industry": "general"
+  },
+  "attribution": {
+    "source": "BiaoShu-SKILL",
+    "repository": "https://github.com/Get00/BiaoShu-SKILL",
+    "license": "Apache-2.0",
+    "copyright": "Copyright Get00 and BiaoShu-SKILL contributors",
+    "absorbedScope": "行业分类名与行业关键词检测规则，来自 BiaoShu-writer-pro/references/industry_configs.json；章节骨架为本包自行归纳，未复制其 Markdown 正文。",
+    "modifications": "由原始 industry_configs.json 提取 8 行业分类与检测参数，重写为 JSON；章节骨架新增。"
+  },
+  "industries": {
+    "it_information": {
+      "label": "信息技术",
+      "keywords": ["软件", "系统集成", "信息化", "平台建设", "数据中心", "网络安全", "云平台", "数据库", "运维服务", "接口开发", "APP", "小程序", "等技术"],
+      "sections": [
+        { "id": "background", "title": "项目背景与建设目标", "hint": "业务现状、痛点、建设必要性" },
+        { "id": "scope", "title": "建设内容与范围", "hint": "功能清单、边界、不在范围内的事项" },
+        { "id": "architecture", "title": "技术要求与架构", "hint": "性能、可用性、安全、兼容性、国产化要求" },
+        { "id": "implementation", "title": "实施计划与交付", "hint": "里程碑、交付物、验收标准" },
+        { "id": "service", "title": "运维与服务要求", "hint": "响应时限、驻场、升级、培训" }
+      ]
+    },
+    "construction": {
+      "label": "工程建设",
+      "keywords": ["施工", "土建", "工程", "装修", "市政", "道路", "桥梁", "监理", "总承包", "安装工程", "安全文明施工"],
+      "sections": [
+        { "id": "background", "title": "工程概况", "hint": "建设地点、规模、投资、资金来源" },
+        { "id": "scope", "title": "招标范围与标段划分", "hint": "标段、工作内容、界面划分" },
+        { "id": "technical", "title": "技术要求", "hint": "规范标准、材料要求、工艺要求" },
+        { "id": "schedule", "title": "工期与进度要求", "hint": "总工期、关键节点、奖惩" },
+        { "id": "safety", "title": "质量安全与文明施工", "hint": "质量标准、安全责任、环保要求" }
+      ]
+    },
+    "medical": {
+      "label": "医疗健康",
+      "keywords": ["医疗", "医院", "器械", "药品", "临床", "诊断", "试剂", "消毒", "诊疗", "医保", "卫健"],
+      "sections": [
+        { "id": "background", "title": "项目背景与临床需求", "hint": "科室现状、诊疗需求、服务人群" },
+        { "id": "scope", "title": "采购内容与配置", "hint": "设备清单、数量、配套" },
+        { "id": "technical", "title": "技术参数要求", "hint": "性能指标、安全标准、兼容性" },
+        { "id": "qualification", "title": "资质与合规要求", "hint": "经营许可、注册证、追溯要求" },
+        { "id": "service", "title": "售后服务与培训", "hint": "维保年限、响应时间、临床培训" }
+      ]
+    },
+    "education": {
+      "label": "教育",
+      "keywords": ["学校", "教学", "课程", "实训", "实验室", "校园", "教育", "培训", "教材", "学生"],
+      "sections": [
+        { "id": "background", "title": "项目背景与教学目标", "hint": "学科建设、培养方案、现有条件" },
+        { "id": "scope", "title": "建设内容", "hint": "设备、软件、课程资源、场地" },
+        { "id": "technical", "title": "技术与功能要求", "hint": "功能点、性能、兼容性" },
+        { "id": "implementation", "title": "实施与验收", "hint": "到货安装、调试、验收标准" },
+        { "id": "service", "title": "培训与运维", "hint": "师资培训、质保期、响应" }
+      ]
+    },
+    "manufacturing": {
+      "label": "制造业",
+      "keywords": ["生产", "制造", "加工", "生产线", "设备采购", "工艺", "模具", "装配", "车间", "产能"],
+      "sections": [
+        { "id": "background", "title": "项目背景与产能需求", "hint": "现有产线、瓶颈、扩产目标" },
+        { "id": "scope", "title": "采购范围", "hint": "设备清单、配套工程、界面" },
+        { "id": "technical", "title": "技术与工艺要求", "hint": "节拍、精度、良率、能耗" },
+        { "id": "implementation", "title": "交付与安装调试", "hint": "交期、安装、试运行" },
+        { "id": "acceptance", "title": "验收与质保", "hint": "验收指标、质保期、备件" }
+      ]
+    },
+    "logistics": {
+      "label": "物流仓储",
+      "keywords": ["物流", "运输", "仓储", "配送", "货运", "仓库", "供应链", "冷链", "装卸", "快递"],
+      "sections": [
+        { "id": "background", "title": "项目背景与业务规模", "hint": "货量、线路、时效要求" },
+        { "id": "scope", "title": "服务范围", "hint": "区域、品类、结算方式" },
+        { "id": "technical", "title": "服务标准与技术要求", "hint": "时效、破损率、信息系统对接" },
+        { "id": "management", "title": "运营管理要求", "hint": "人员、车辆、应急预案" },
+        { "id": "settlement", "title": "结算与考核", "hint": "计价方式、考核扣罚" }
+      ]
+    },
+    "consulting": {
+      "label": "咨询服务",
+      "keywords": ["咨询", "规划", "设计", "评估", "调研", "课题", "方案编制", "可行性研究", "审计", "顾问"],
+      "sections": [
+        { "id": "background", "title": "项目背景与目标", "hint": "委托背景、决策需求" },
+        { "id": "scope", "title": "服务内容与成果", "hint": "工作内容、交付成果清单" },
+        { "id": "method", "title": "方法与技术要求", "hint": "研究方法、数据来源、质量标准" },
+        { "id": "schedule", "title": "进度与人员要求", "hint": "阶段划分、团队配置" },
+        { "id": "acceptance", "title": "成果验收", "hint": "评审方式、修改轮次" }
+      ]
+    },
+    "general": {
+      "label": "通用",
+      "keywords": [],
+      "sections": [
+        { "id": "background", "title": "项目背景与需求", "hint": "现状、必要性、目标" },
+        { "id": "scope", "title": "采购内容与范围", "hint": "标的、数量、边界" },
+        { "id": "technical", "title": "技术与服务要求", "hint": "功能、性能、标准" },
+        { "id": "implementation", "title": "实施与交付", "hint": "周期、交付物、验收" },
+        { "id": "commercial", "title": "商务要求", "hint": "付款、质保、违约" }
+      ]
+    }
+  }
+}

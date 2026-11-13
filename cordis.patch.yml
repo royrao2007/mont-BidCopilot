@@ -1,0 +1,12 @@
+# mont-BidCopilot bundle patch.
+# One row: the Host half registers the mont_* tools, the compliance kernel and
+# the gate machine. Overriding this row must restate the whole config block.
+- insert:
+    - id: mont-bidcopilot
+      name: 'dsh-mont-bidcopilot'
+      config:
+        dataDir: ''
+        allowWrite: true
+        selfDupThreshold: 0.85
+        collusionThreshold: 0.65
+        kbDir: ''

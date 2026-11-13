@@ -1,0 +1,7 @@
+# 本机链接：为让宿主 schemastery 在开发/直连安装时可解析而建的 junction，
+# 不属于包内容（package.json#files 不含 node_modules），也不应提交。
+node_modules/
+
+# 测试与调试产物
+*.tmp
+*.log

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300" role="img" aria-label="候选条款在生成任何文本之前被合规规则拦下，三道人工门禁签署后才允许导出 Word 文档">
+  <rect x="0" y="0" width="640" height="300" rx="10" fill="#f7f8fa"/>
+
+  <!-- 左：候选条款被拦截 -->
+  <rect x="48" y="64" width="150" height="112" rx="8" fill="#ffffff" stroke="#9aa3ad" stroke-width="2"/>
+  <rect x="64" y="82" width="118" height="7" rx="3.5" fill="#c3c9d1"/>
+  <rect x="64" y="98" width="118" height="7" rx="3.5" fill="#c3c9d1"/>
+  <rect x="64" y="114" width="86" height="7" rx="3.5" fill="#c3c9d1"/>
+  <rect x="64" y="130" width="102" height="7" rx="3.5" fill="#c3c9d1"/>
+  <rect x="64" y="146" width="70" height="7" rx="3.5" fill="#c3c9d1"/>
+
+  <circle cx="182" cy="82" r="21" fill="#c62828"/>
+  <rect x="170" y="79.5" width="24" height="5" rx="2.5" fill="#ffffff" transform="rotate(45 182 82)"/>
+
+  <!-- 指向门禁 -->
+  <path d="M206 120 H238" fill="none" stroke="#6b7280" stroke-width="3" stroke-linecap="round"/>
+  <path d="M232 113 L242 120 L232 127" fill="none" stroke="#6b7280" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 中：三道人工门禁 -->
+  <g>
+    <rect x="250" y="58" width="150" height="50" rx="7" fill="#ffffff" stroke="#1a7f37" stroke-width="2"/>
+    <circle cx="275" cy="83" r="13" fill="#1a7f37"/>
+    <path d="M269 83 L273.5 87.5 L282 78" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="298" y="74" width="84" height="7" rx="3.5" fill="#c3c9d1"/>
+    <rect x="298" y="87" width="56" height="6" rx="3" fill="#dfe3e8"/>
+  </g>
+  <g>
+    <rect x="250" y="125" width="150" height="50" rx="7" fill="#ffffff" stroke="#1a7f37" stroke-width="2"/>
+    <circle cx="275" cy="150" r="13" fill="#1a7f37"/>
+    <path d="M269 150 L273.5 154.5 L282 145" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="298" y="141" width="84" height="7" rx="3.5" fill="#c3c9d1"/>
+    <rect x="298" y="154" width="56" height="6" rx="3" fill="#dfe3e8"/>
+  </g>
+  <g>
+    <rect x="250" y="192" width="150" height="50" rx="7" fill="#ffffff" stroke="#6b7280" stroke-width="2" stroke-dasharray="7 5"/>
+    <circle cx="275" cy="217" r="13" fill="none" stroke="#6b7280" stroke-width="2.5"/>
+    <rect x="298" y="208" width="84" height="7" rx="3.5" fill="#dfe3e8"/>
+    <rect x="298" y="221" width="56" height="6" rx="3" fill="#e8ebee"/>
+  </g>
+
+  <!-- 指向导出 -->
+  <path d="M410 145 H442" fill="none" stroke="#6b7280" stroke-width="3" stroke-linecap="round"/>
+  <path d="M436 138 L446 145 L436 152" fill="none" stroke="#6b7280" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 右：导出的文档 -->
+  <g>
+    <path d="M470 64 H552 L584 96 V214 H470 Z" fill="#ffffff" stroke="#9aa3ad" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M552 64 V96 H584" fill="none" stroke="#9aa3ad" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="488" y="112" width="78" height="7" rx="3.5" fill="#c3c9d1"/>
+    <rect x="488" y="128" width="78" height="7" rx="3.5" fill="#c3c9d1"/>
+    <rect x="488" y="144" width="58" height="7" rx="3.5" fill="#c3c9d1"/>
+    <rect x="488" y="160" width="70" height="7" rx="3.5" fill="#c3c9d1"/>
+    <rect x="488" y="176" width="44" height="7" rx="3.5" fill="#c3c9d1"/>
+  </g>
+  <circle cx="574" cy="196" r="24" fill="#1a7f37"/>
+  <path d="M562 196 L570 204 L586 185" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

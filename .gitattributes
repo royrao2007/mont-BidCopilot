@@ -1,0 +1,9 @@
+# 统一行尾，避免 Windows 检出后产生无意义的 CRLF 改动。
+* text=auto eol=lf
+
+# 二进制与不参与换行转换的文件
+*.svg -text
+*.png -text
+*.jpg -text
+*.webp -text
+*.docx -text
