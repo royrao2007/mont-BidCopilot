@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { checkClause, checkFactSource, FACT_SOURCE_POLICY, loadRules } from '../lib/guard.js'
-import { setFact, FactError, inferCategory } from '../lib/facts.js'
+import { setFact, verifyFact, FactError, inferCategory } from '../lib/facts.js'
 import { createRuntime } from '../lib/runtime.js'
 import { checkSelfDuplication, checkCollusion, similarity } from '../lib/similarity.js'
 
@@ -250,13 +250,21 @@ test('合规｜setFact 缺来源声明直接拒绝', () => {
   )
 })
 
-test('合规｜人工录入的事实初始为 VERIFIED，外部引用仍为 UNVERIFIED', () => {
+test('合规｜manual 录入为 UNVERIFIED，须显式核验才转 VERIFIED', () => {
   const project = { facts: [] }
   const manual = setFact(project, { key: 'enterpriseName', value: '甲公司', source: 'manual' })
-  assert.equal(manual.fact.status, 'VERIFIED')
+  // 录入 ≠ 核验：人工把材料敲进系统后仍需一次带 operator 的核验动作。
+  assert.equal(manual.fact.status, 'UNVERIFIED', '手动录入不应自动视为已核验')
+
+  const verified = verifyFact(project, 'enterpriseName', { operator: '张三' })
+  assert.equal(verified.fact.status, 'VERIFIED', '显式核验后才转已核验')
+  assert.equal(verified.fact.verifiedBy, '张三')
 
   const technical = setFact(project, { key: 'technicalApproach', value: '采用微服务架构', source: 'L2' })
   assert.equal(technical.fact.status, 'UNVERIFIED', '外部引用不等于本企业事实已核实')
+
+  const kb = setFact(project, { key: 'creditCode', value: '91110000MA00000001', source: 'verified_kb' })
+  assert.equal(kb.fact.status, 'VERIFIED', '已核验企业库来源可直接视为已核验')
 })
 
 test('合规｜事实类别可按键名推断', () => {

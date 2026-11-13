@@ -396,7 +396,7 @@ test('元数据｜顶层 description 为英文且与 locale 主张一致（不�
   const pkg = JSON.parse(read('package.json'))
   const hanCount = (pkg.description.match(/\p{Script=Han}/gu) ?? []).length
   assert.equal(hanCount, 0, 'package.json description 应为英文')
-  assert.ok(pkg.description.includes('21'), '应写明工具数量')
+  assert.ok(pkg.description.includes('24'), '应写明工具数量')
   assert.ok(/no install-time scripts/iu.test(pkg.description), '应声明无安装期脚本')
   // 未实现的能力不得出现在描述里
   for (const notImplemented of ['PDF export', 'OCR', 'vector']) {
@@ -522,14 +522,14 @@ test('文档｜README 明确说明门禁批准只能由人执行', () => {
   assert.ok(usage.includes('mont_wf_advance'), '须提到 mont_wf_advance 的边界')
 })
 
-test('文档｜README 提到的工具名与代码注册的 21 个完全一致（无虚构、无遗漏）', () => {
+test('文档｜README 提到的工具名与代码注册的 24 个完全一致（无虚构、无遗漏）', () => {
   const readme = read('README.md')
   const toolsSource = read('lib/tools.js')
 
   const registered = new Set([...toolsSource.matchAll(/'(mont_[a-z_]+)'/gu)].map(match => match[1]))
   const mentioned = new Set([...readme.matchAll(/(mont_[a-z_]+)/gu)].map(match => match[1]))
 
-  assert.equal(registered.size, 21, `代码应注册 21 个工具，实际 ${registered.size}`)
+  assert.equal(registered.size, 24, `代码应注册 24 个工具，实际 ${registered.size}`)
 
   const fictional = [...mentioned].filter(name => !registered.has(name))
   assert.deepEqual(fictional, [], `README 提到代码中不存在的工具：${fictional.join(',')}`)

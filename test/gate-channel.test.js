@@ -104,6 +104,10 @@ async function prepareProject(host, name = '通道测试项目') {
   await host.call('mont_guard_verify_fact', {
     projectId, key: 'enterpriseName', value: '测试科技有限公司', source: 'manual',
   })
+  // manual 录入后仍是 UNVERIFIED，须再走一次显式核验（带 operator）才可放行门2。
+  await host.call('mont_guard_verify_fact', {
+    projectId, key: 'enterpriseName', operator: 'tester',
+  })
   return projectId
 }
 
@@ -168,19 +172,28 @@ test('人机通道｜命令 approve 写入审计链并可导出', async () => {
     await host.call('mont_guard_verify_fact', {
       projectId, key: 'creditCode', value: '91110000MA00000001', source: 'manual',
     })
+    // manual 录入是 UNVERIFIED，须显式核验后才不阻塞门2 放行。
+    await host.call('mont_guard_verify_fact', { projectId, key: 'creditCode', operator: 'tester' })
 
     const gate2 = await host.invoke(`${projectId} approve gate2 张三`)
-    assert.equal(gate2.kind, 'success')
+    assert.equal(gate2.kind, 'success', `实际返回：${gate2.text}`)
     assert.ok(gate2.text.includes('门2'))
-    assert.ok(gate2.text.includes('seq 1'))
+    assert.ok(gate2.text.includes('门禁序号 1'))
 
     const gate3 = await host.invoke(`${projectId} approve gate3 李四`)
-    assert.equal(gate3.kind, 'success')
-    assert.ok(gate3.text.includes('seq 2'))
+    assert.equal(gate3.kind, 'success', `实际返回：${gate3.text}`)
+    assert.ok(gate3.text.includes('门禁序号 1'))
 
     const status = await host.call('mont_wf_advance', { projectId, action: 'status' })
     assert.equal(status.auditChain.valid, true)
-    assert.equal(status.auditChain.records.length, 2)
+    // 审计链现在同时记录门禁裁决与写入活动，按 kind 区分后门禁裁决应为 2 条。
+    // 全局 seq 含活动记录，故只断言"门禁裁决之间的相对顺序"，不断言绝对 seq。
+    const gateRecords = status.auditChain.records.filter(record => (record.kind ?? 'gate') === 'gate')
+    assert.equal(gateRecords.length, 2)
+    assert.deepEqual(gateRecords.map(record => record.gateId), ['gate2', 'gate3'])
+    assert.ok(gateRecords[0].seq < gateRecords[1].seq, '门禁裁决在链上保持先后顺序')
+    assert.equal(status.auditChain.gateDecisions, 2, '门禁裁决计数应单独统计')
+    assert.ok(status.auditChain.activities > 0, '写入活动应入链')
     assert.equal(status.gates.gate2.decidedBy, '张三')
     assert.equal(status.gates.gate3.decidedBy, '李四')
 
@@ -224,6 +237,7 @@ test('人机通道｜reject 使工作流冻结且不可再推进', async () => {
     await host.call('mont_guard_verify_fact', {
       projectId, key: 'creditCode', value: '91110000MA00000001', source: 'manual',
     })
+    await host.call('mont_guard_verify_fact', { projectId, key: 'creditCode', operator: 'tester' })
     const afterFreeze = await host.invoke(`${projectId} approve gate2 张三`)
     assert.equal(afterFreeze.kind, 'error')
     assert.ok(afterFreeze.text.includes('E_WORKFLOW_FROZEN'))
@@ -236,7 +250,9 @@ test('人机通道｜同一门不能裁决两次', async () => {
     await host.call('mont_guard_verify_fact', {
       projectId, key: 'creditCode', value: '91110000MA00000001', source: 'manual',
     })
-    assert.equal((await host.invoke(`${projectId} approve gate2 张三`)).kind, 'success')
+    await host.call('mont_guard_verify_fact', { projectId, key: 'creditCode', operator: 'tester' })
+    const first = await host.invoke(`${projectId} approve gate2 张三`)
+    assert.equal(first.kind, 'success', `首次裁决应成功，实际：${first.text}`)
     const again = await host.invoke(`${projectId} approve gate2 李四`)
     assert.equal(again.kind, 'error')
     assert.ok(again.text.includes('E_GATE_ALREADY_DECIDED'))
