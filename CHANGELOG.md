@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.1.3 — 2026-11-13
+
+新增 market/index.json：format-1 市场索引，供 DSH「插件市场 → 发现 → 索引源」添加后浏览与一键安装。图标以内嵌 data URL 提供（市场无法访问本机文件）。随包分发，可用 raw.githubusercontent 或 jsDelivr 指向本仓库该文件。
+
+索引字段与 mont-forge 的既有索引逐项对齐，并新增测试校验：版本/时间戳/engines 与 package.json 一致、分类与标签能在顶层解析、icon 为 data URL、files 包含 market。
+
 ## 0.1.2 — 2026-11-13
 
 README 许可证章节不再展开 AGPL 排除细节，只保留一句 MIT 与指向 NOTICE.md；具体排除记录与许可证核对依据留在 NOTICE.md（合规义务需要保留）。

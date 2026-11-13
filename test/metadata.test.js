@@ -278,6 +278,48 @@ test('文档｜文档声称存在的路径必须真实存在（不许写不存�
   assert.equal(failed, false, `文档声称了不存在的路径：\n${output}`)
 })
 
+test('市场｜market/index.json 是合法的 format-1 索引且与 package.json 一致', async () => {
+  const market = JSON.parse(read('market/index.json'))
+  const pkg = JSON.parse(read('package.json'))
+
+  assert.equal(market.format, 1, '市场索引 format 必须为 1')
+  assert.ok(Array.isArray(market.plugins) && market.plugins.length > 0, '索引须至少含一个插件')
+
+  const entry = market.plugins[0]
+  assert.equal(entry.name, pkg.name, '索引条目名须等于 npm 包名')
+
+  // 版本与发布时间必须与 package.json 对齐，否则市场显示的版本会滞后
+  const version = entry.versions?.[0]
+  assert.ok(version !== undefined, '缺 versions[0]')
+  assert.equal(version.version, pkg.version, '索引版本须等于 package.json 版本')
+  assert.equal(version.source?.type, 'npm', '分发来源应为 npm')
+  assert.ok(
+    Number.isInteger(version.publishTimestamp) && version.publishTimestamp > 0,
+    'publishTimestamp 必须是真实 Unix 秒级时间戳（0 会被市场当作未知）',
+  )
+  assert.equal(version.engines?.dsh, pkg.engines.dsh, '索引 engines.dsh 须与清单一致')
+
+  // 分类与标签必须能在顶层 metadata 里解析到，否则市场筛选会失效
+  const category = entry.metadata?.category
+  assert.ok(category !== undefined, '条目缺 metadata.category')
+  assert.ok(
+    market.metadata?.categories?.[category] !== undefined,
+    `分类 ${category} 未在顶层 categories 中声明`,
+  )
+  for (const label of entry.metadata?.labels ?? []) {
+    assert.ok(
+      market.metadata?.labels?.[label] !== undefined,
+      `标签 ${label} 未在顶层 labels 中声明`,
+    )
+  }
+
+  // icon 必须内嵌为 data URL（市场无法访问本机路径或相对文件）
+  assert.match(entry.icon ?? '', /^data:image\//u, 'icon 必须是内嵌 data URL')
+
+  // 打包清单必须包含 market 目录，否则发布后市场源不可用
+  assert.ok(pkg.files.includes('market'), 'package.json#files 必须包含 market')
+})
+
 test('元数据｜插件显示名统一为英文 mont-BidCopilot，不用中文别名', () => {
   // 插件在 Plugin Manager 里显示的名字来自 locale 的 meta.title。
   for (const file of ['locale/en.json', 'locale/zh.json']) {
