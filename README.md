@@ -37,31 +37,53 @@ mont-BidCopilot 是招投标双模辅助编制引擎，DeepSeek Harness（DSH）
 | Node.js | `>=22.5.0` | `node -v` |
 | 第三方依赖 | **无需安装**（运行时零依赖） | — |
 
-### 方式一：命令行安装（推荐）
+### 方式一：从 GitHub 安装（推荐，任何人可用）
 
-在 DSH 会话里让插件管理器安装，`target` 填包的**绝对路径**：
+公网仓库：**https://github.com/royrao2007/mont-BidCopilot**
+
+在 DSH 会话里让插件管理器直接从 GitHub 拉取，`target` 填 git 地址：
 
 ```text
-plugin_manager install_bundle target: F:\DSHDesktop\chajian\mont-BidCopilot
+plugin_manager install_bundle target: github:royrao2007/mont-BidCopilot
 ```
 
-也会话中直接说一句即可，agent 会自己调：
+或直接说一句，agent 会自己调：
 
-> 把 `F:\DSHDesktop\chajian\mont-BidCopilot` 装成插件
+> 从 `github:royrao2007/mont-BidCopilot` 装 mont-BidCopilot 插件
+
+也可以用完整 URL：
+
+```text
+plugin_manager install_bundle target: https://github.com/royrao2007/mont-BidCopilot.git
+```
 
 **成功判据**（三条都要满足，缺一不算装好）：
 
-1. 返回里 `application` 为 `applied`，或提示 `restart-required`（本 profile 无 HMR 时正常）；
+1. 返回里 `application` 为 `applied`，或提示 `restart-required`（profile 未开 HMR 时正常）；
 2. 插件列表出现 `include:mont-bidcopilot`，`fiberPhase` 为 `active`；
 3. 新会话里 `mont_ping` 能调通，返回 `toolCount: 21`。
 
 `restart-required` 表示改动未生效，**重启 DSH** 后再验证第 2、3 条。
 
-### 方式二：图形界面安装
+### 方式二：从本地克隆安装（开发者）
+
+已把仓库克隆到本机时，`target` 填**你本机**的克隆路径（下面只是示例，换成你自己的目录）：
+
+```powershell
+git clone https://github.com/royrao2007/mont-BidCopilot.git D:\plugins\mont-BidCopilot
+```
+
+```text
+plugin_manager install_bundle target: D:\plugins\mont-BidCopilot
+```
+
+本地目录方式的好处是改代码后重启 DSH 即生效，适合二次开发。
+
+### 方式三：图形界面安装
 
 1. 打开 DSH 左侧栏 **Plugins**（插件）；
 2. 点 **Add plugin**（添加插件）；
-3. 选择本地目录 `F:\DSHDesktop\chajian\mont-BidCopilot`；
+3. 填写 git 地址 `github:royrao2007/mont-BidCopilot`，或选择你本机的克隆目录；
 4. 安装后确认插件行出现「mont-BidCopilot」，图标为蓝底文档 + 绿色勾；
 5. 如果状态提示需要重启，重启 DSH。
 
@@ -75,7 +97,7 @@ plugin_manager install_bundle target: F:\DSHDesktop\chajian\mont-BidCopilot
 mont_ping
 ```
 
-期望返回：
+期望返回（`storageRoot` 会是你本机的实际路径）：
 
 ```json
 {
@@ -83,7 +105,7 @@ mont_ping
   "name": "mont-BidCopilot",
   "toolCount": 21,
   "dshEngineRange": ">=0.2.2-rc.1",
-  "storageRoot": "F:\\DSHDesktop\\dsh-home\\bidcopilot\\projects"
+  "storageRoot": "<DSH_HOME>/bidcopilot/projects"
 }
 ```
 
@@ -91,14 +113,20 @@ mont_ping
 
 ### 升级
 
-源码目录更新后，DSH 需重启加载新的 JavaScript 模块（插件代码不参与热更新）：
+更新后 DSH 需重启加载新的 JavaScript 模块（插件代码不参与热更新）：
 
 ```powershell
-# 1. 拉取新版本（若从 git 安装）
-git -C F:\DSHDesktop\chajian\mont-BidCopilot pull
+# 1. 拉取新版本（换成你自己的克隆目录；从 git 直装的话可让插件管理器重装）
+git -C <你的克隆目录> pull
 
 # 2. 重启 DSH
 # 3. 新会话里跑 mont_ping 确认 version 与 toolCount
+```
+
+重新安装也可直接覆盖：
+
+```text
+plugin_manager install_bundle target: github:royrao2007/mont-BidCopilot
 ```
 
 `locale` 与 `docs` 是静态资源，Plugin Manager 按需读取，改完刷新插件页即可，不必重启。
@@ -289,13 +317,13 @@ agent 做不到这一步——`mont_wf_advance` 对 `approve` 会硬拒。**你�
 
 ### 创建知识库资料目录（可选）
 
-要让 `mont_kb_search` 可用，需在配置里指定 `kbDir`：
+要让 `mont_kb_search` 可用，需在配置里指定 `kbDir`（填你自己的企业资料目录）：
 
 ```yaml
 - id: mont-bidcopilot
   name: 'dsh-mont-bidcopilot'
   config:
-    kbDir: 'F:\你的企业资料目录'
+    kbDir: '<你的企业资料目录>'
 ```
 
 然后：

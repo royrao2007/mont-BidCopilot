@@ -188,6 +188,38 @@ test('文档｜内部实施方案文档不得进入仓库与 npm 包', () => {
   }
 })
 
+test('文档｜发布文档不得包含本机专属路径（别人没有 F 盘）', async () => {
+  const { execFileSync } = await import('node:child_process')
+  const script = join(root, 'scripts', 'check-portable-docs.mjs')
+
+  // 该脚本自行断言并以退出码表达结果，这里只转发其失败。
+  let output = ''
+  let failed = false
+  try {
+    output = execFileSync(process.execPath, [script], { encoding: 'utf8' })
+  } catch (error) {
+    failed = true
+    output = `${error.stdout ?? ''}${error.stderr ?? ''}`
+  }
+  assert.equal(failed, false, `发布文档含本机专属路径：\n${output}`)
+})
+
+test('文档｜README 安装说明使用公网 git 地址而非本机绝对路径', () => {
+  const readme = read('README.md')
+
+  // 别人能照抄的形式
+  assert.ok(
+    readme.includes('github:royrao2007/mont-BidCopilot')
+      || readme.includes('https://github.com/royrao2007/mont-BidCopilot.git'),
+    'README 必须给出公网 git 安装地址',
+  )
+  assert.ok(readme.includes('https://github.com/royrao2007/mont-BidCopilot'), 'README 必须给出仓库公网 URL')
+
+  // 本地克隆路径只作为"换成你自己的目录"的示例出现，且不得是作者机器路径
+  assert.equal(/F:\\DSHDesktop|F:\\deepseek harness/u.test(readme), false, 'README 不得出现作者本机路径')
+  assert.equal(/[A-Za-z]:\\chajian/u.test(readme), false, 'README 不得出现作者本机目录名')
+})
+
 test('元数据｜插件显示名统一为英文 mont-BidCopilot，不用中文别名', () => {
   // 插件在 Plugin Manager 里显示的名字来自 locale 的 meta.title。
   for (const file of ['locale/en.json', 'locale/zh.json']) {
@@ -272,14 +304,15 @@ test('文档｜README 的安装章节包含完整步骤（要求、安装、验�
 
   assert.ok(readme.includes('## 安装'), '缺安装章节')
   const required = [
-    '### 环境要求',           // 版本与依赖前提
-    '### 方式一：命令行安装',   // 至少一种安装途径
-    '### 方式二：图形界面安装', // 第二种途径
-    '### 验证安装成功',       // 装完怎么确认
-    '### 升级',              // 后续怎么更新
-    '### 卸载',              // 怎么移除且数据留痕
-    '### 安装故障排查',       // 失败怎么办
-    '### 目录与数据位置',     // 数据写在哪
+    '### 环境要求',              // 版本与依赖前提
+    '### 方式一：从 GitHub 安装', // 公众可照抄的主路径
+    '### 方式二：从本地克隆安装', // 开发者路径
+    '### 方式三：图形界面安装',   // 界面操作
+    '### 验证安装成功',          // 装完怎么确认
+    '### 升级',                 // 后续怎么更新
+    '### 卸载',                 // 怎么移除且数据留痕
+    '### 安装故障排查',          // 失败怎么办
+    '### 目录与数据位置',        // 数据写在哪
   ]
   for (const section of required) {
     assert.ok(readme.includes(section), `安装章节缺少「${section}」`)

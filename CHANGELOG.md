@@ -76,7 +76,19 @@ README 原先只有一行安装命令与工具清单，缺可照做的操作流�
 
 新增 4 条测试锁定文档完整性：安装章节 8 个必选小节齐全、使用章节覆盖 15 个关键工具、门禁命令可直接复制、**README 提到的工具名与代码注册的 21 个完全一致（无虚构、无遗漏）**。
 
+### 文档：安装说明改为公网可用的地址
+
+原 README 的安装示例写的是作者本机的盘符路径，别人机器上没有那个盘，照抄必然失败。改为三种均可用的方式：
+
+1. **从 GitHub 安装（推荐，任何人可用）**：`plugin_manager install_bundle target: github:royrao2007/mont-BidCopilot`，也支持完整 URL。本机 profile 里 `huashu-nuwa` 就是 `github:` 形式，证明这条路径可用。
+2. **从本地克隆安装（开发者）**：给出 `git clone` 命令，并注明路径需换成自己的目录。
+3. **图形界面安装**：填 git 地址或选本地目录。
+
+同时清掉文档中其余本机专属内容：升级章节的 `git -C` 目标改为占位符、`mont_ping` 示例的 `storageRoot` 改为 `<DSH_HOME>/bidcopilot/projects`、知识库配置示例的 `kbDir` 改为占位符。
+
+新增 `scripts/check-portable-docs.mjs` 并接入测试：扫描 8 个发布文档，命中本机盘符路径、用户目录绝对路径、或本机专有目录名即失败，同时正向断言 README 必须提供公网 git 安装地址。
+
 ### 测试与实证
 
-- 六组基线 **118 项全绿**。
+- 六组基线 **122 项全绿**。
 - 真实装载通路验证（Cordis 风格 ctx 调 `apply()`）：`Config['~standard'].vendor = schemastery`、注册工具 **21** 个、`mont_ping.toolCount = 21`、`mont_guard_check_clause` 命中返回 `T-B1`。
