@@ -9,7 +9,7 @@
 | 项 | 值 |
 |---|---|
 | npm 包名 | `dsh-mont-bidcopilot` |
-| latest 版本 | **0.2.0** |
+| latest 版本 | **0.2.1** |
 | GitHub 仓库 | <https://github.com/royrao2007/mont-BidCopilot> |
 | 许可证 | MIT |
 
@@ -17,10 +17,10 @@
 
 | 渠道 | 状态 | 核对方式 | 下一步 |
 |---|---|---|---|
-| **npm 官方源** | 已上线 0.2.0 | `npm view dsh-mont-bidcopilot version --registry=https://registry.npmjs.org` | 无 |
+| **npm 官方源** | 已上线 0.2.1 | `npm view dsh-mont-bidcopilot version --registry=https://registry.npmjs.org` | 无 |
 | **DSH 插件页（npm 包名安装）** | 可用 | 输入框填 `dsh-mont-bidcopilot`，安装源选 npm 官方源 | 无 |
 | **公共目录 dsh-plugin-catalog** | 待收录 | `https://cdn.jsdelivr.net/npm/dsh-plugin-catalog/index.json` 里搜包名 | 等下次重建（见下） |
-| **自建市场索引（jsDelivr）** | 可用 0.2.0 | `https://cdn.jsdelivr.net/npm/dsh-mont-bidcopilot/market/index.json` | 无 |
+| **自建市场索引（jsDelivr）** | 可用 0.2.1 | `https://cdn.jsdelivr.net/npm/dsh-mont-bidcopilot/market/index.json` | 无 |
 | **自建市场索引（GitHub raw）** | 可用（网络不稳） | `https://raw.githubusercontent.com/royrao2007/mont-BidCopilot/master/market/index.json` | 国内建议用 jsDelivr 或 gh-proxy |
 
 ## 公共目录收录机制
@@ -29,9 +29,9 @@
 
 - 重建频率：每天一次，约 **UTC 05:20**（北京时间 13:20）
 - 判据：npm 包存在，且 `package.json` 带 `repository`、`homepage`、`keywords`、`license`
-- 我的包已具备上述全部字段；`mont-forge` 同为该目录收录项（版本 0.2.0），可作对照
+- 我的包已具备上述全部字段；`mont-forge` 同为该目录收录项（版本 0.2.1），可作对照
 
-**时间差造成未收录**：0.1.0—0.2.0 的发布时间（UTC 05:41 起）都晚于当日重建点（05:19:54），因此最早要到下一个重建周期才进目录。
+**时间差造成未收录**：0.1.0—0.2.1 的发布时间（UTC 05:41 起）都晚于当日重建点（05:19:54），因此最早要到下一个重建周期才进目录。
 
 ## 自建索引的订阅方式
 
