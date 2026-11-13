@@ -214,3 +214,110 @@ test('元数据｜README 不得宣称未实现的能力', () => {
   const claim = /(?:支持|提供)(?:PDF 导出|OCR|向量检索)/u.exec(readme)
   assert.equal(claim, null, `README 不得直接宣称未实现能力：${claim?.[0]}`)
 })
+
+test('文档｜README 的安装章节包含完整步骤（要求、安装、验证、升级、卸载、排障、数据位置）', () => {
+  const readme = read('README.md')
+
+  assert.ok(readme.includes('## 安装'), '缺安装章节')
+  const required = [
+    '### 环境要求',           // 版本与依赖前提
+    '### 方式一：命令行安装',   // 至少一种安装途径
+    '### 方式二：图形界面安装', // 第二种途径
+    '### 验证安装成功',       // 装完怎么确认
+    '### 升级',              // 后续怎么更新
+    '### 卸载',              // 怎么移除且数据留痕
+    '### 安装故障排查',       // 失败怎么办
+    '### 目录与数据位置',     // 数据写在哪
+  ]
+  for (const section of required) {
+    assert.ok(readme.includes(section), `安装章节缺少「${section}」`)
+  }
+
+  // 成功判据必须是可观察的三条，而不是「装好了」
+  assert.ok(readme.includes('成功判据'), '应给出可观察的成功判据')
+  assert.ok(readme.includes('fiberPhase'), '判据应包含 fiberPhase 状态')
+  assert.ok(readme.includes('toolCount'), '判据应包含 toolCount 验证')
+
+  // 卸载必须说明数据保留，避免误以为删项目
+  const uninstall = readme.slice(readme.indexOf('### 卸载'), readme.indexOf('### 安装故障排查'))
+  assert.ok(/保留|不会删除/u.test(uninstall), '卸载说明须交代项目目录是否保留')
+})
+
+test('文档｜README 的使用章节给出可照做的操作顺序，覆盖两侧与门禁', () => {
+  const readme = read('README.md')
+
+  assert.ok(readme.includes('## 使用方法'), '缺使用方法章节')
+
+  // 投标侧完整链路
+  assert.ok(readme.includes('### 一分钟上手：投标侧走一遍'), '缺投标侧上手流程')
+  // 招标侧完整链路
+  assert.ok(readme.includes('### 招标侧走一遍'), '缺招标侧上手流程')
+  // 门禁命令必须可查
+  assert.ok(readme.includes('### 门禁命令速查'), '缺门禁命令速查')
+  // 常见问题
+  assert.ok(readme.includes('### 常见问题'), '缺常见问题')
+
+  // 每一步都要点明对应工具，否则用户不知道 agent 在调什么
+  const usage = readme.slice(readme.indexOf('## 使用方法'), readme.indexOf('## 三条不可逾越的边界'))
+  for (const tool of [
+    'mont_project_create',
+    'mont_bid_parse',
+    'mont_bid_outline',
+    'mont_bid_write_section',
+    'mont_guard_verify_fact',
+    'mont_bid_lock_facts',
+    'mont_guard_similarity_check',
+    'mont_bid_export',
+    'mont_tender_parse',
+    'mont_tender_match_industry',
+    'mont_tender_draft_section',
+    'mont_tender_check_consistency',
+    'mont_guard_check_clause',
+    'mont_guard_source_policy',
+    'mont_kb_search',
+  ]) {
+    assert.ok(usage.includes(tool), `使用章节未提及 ${tool}，用户无法对应到工具`)
+  }
+
+  // 门禁命令必须给出可直接复制的形式
+  assert.ok(usage.includes('/bidcopilot-gate'), '使用章节须给出门禁命令')
+  assert.ok(usage.includes('approve gate2'), '须给出批准门2 的具体写法')
+  assert.ok(usage.includes('approve gate1'), '须给出批准门1 的具体写法')
+
+  // 导出阻断码要有解释表，否则用户看到 blocker 无法处理
+  for (const code of [
+    'E_UNVERIFIED_FACTS',
+    'E_GATE2_NOT_APPROVED',
+    'E_GATE3_NOT_APPROVED',
+    'E_SELF_DUPLICATION',
+    'E_COLLUSION_RISK',
+  ]) {
+    assert.ok(usage.includes(code), `缺少阻断码说明：${code}`)
+  }
+})
+
+test('文档｜README 明确说明门禁批准只能由人执行', () => {
+  const readme = read('README.md')
+  const usage = readme.slice(readme.indexOf('## 使用方法'))
+  assert.ok(
+    /agent 做不到这一步|只能由人|由人来做|你自己在输入框/u.test(usage),
+    '使用章节须明确门禁批准由人执行，agent 做不到',
+  )
+  assert.ok(usage.includes('mont_wf_advance'), '须提到 mont_wf_advance 的边界')
+})
+
+test('文档｜README 提到的工具名与代码注册的 21 个完全一致（无虚构、无遗漏）', () => {
+  const readme = read('README.md')
+  const toolsSource = read('lib/tools.js')
+
+  const registered = new Set([...toolsSource.matchAll(/'(mont_[a-z_]+)'/gu)].map(match => match[1]))
+  const mentioned = new Set([...readme.matchAll(/(mont_[a-z_]+)/gu)].map(match => match[1]))
+
+  assert.equal(registered.size, 21, `代码应注册 21 个工具，实际 ${registered.size}`)
+
+  const fictional = [...mentioned].filter(name => !registered.has(name))
+  assert.deepEqual(fictional, [], `README 提到代码中不存在的工具：${fictional.join(',')}`)
+
+  const undocumented = [...registered].filter(name => !mentioned.has(name))
+  assert.deepEqual(undocumented, [], `以下工具未在 README 中出现：${undocumented.join(',')}`)
+})

@@ -29,12 +29,297 @@
 
 ## 安装
 
-```powershell
-# 在 DSH 会话里交给插件管理器（Desktop 插件页或 plugin_manager 工具）
+### 环境要求
+
+| 项 | 要求 | 检查命令 |
+|---|---|---|
+| DSH | `>=0.2.2-rc.1` | 插件页右下角版本号，或 `dsh --version` |
+| Node.js | `>=22.5.0` | `node -v` |
+| 第三方依赖 | **无需安装**（运行时零依赖） | — |
+
+### 方式一：命令行安装（推荐）
+
+在 DSH 会话里让插件管理器安装，`target` 填包的**绝对路径**：
+
+```text
 plugin_manager install_bundle target: F:\DSHDesktop\chajian\mont-BidCopilot
 ```
 
-环境要求：DSH `>=0.2.2-rc.1`，Node `>=22.5.0`。运行时零第三方依赖。
+也会话中直接说一句即可，agent 会自己调：
+
+> 把 `F:\DSHDesktop\chajian\mont-BidCopilot` 装成插件
+
+**成功判据**（三条都要满足，缺一不算装好）：
+
+1. 返回里 `application` 为 `applied`，或提示 `restart-required`（本 profile 无 HMR 时正常）；
+2. 插件列表出现 `include:mont-bidcopilot`，`fiberPhase` 为 `active`；
+3. 新会话里 `mont_ping` 能调通，返回 `toolCount: 21`。
+
+`restart-required` 表示改动未生效，**重启 DSH** 后再验证第 2、3 条。
+
+### 方式二：图形界面安装
+
+1. 打开 DSH 左侧栏 **Plugins**（插件）；
+2. 点 **Add plugin**（添加插件）；
+3. 选择本地目录 `F:\DSHDesktop\chajian\mont-BidCopilot`；
+4. 安装后确认插件行出现「招投标双模辅助编制」，图标为蓝底文档 + 绿色勾；
+5. 如果状态提示需要重启，重启 DSH。
+
+安装后可在插件详情页看到中英文标题、描述、权限说明和示意图（`locale/en.json`、`locale/zh.json`、`docs/DETAIL.md`）。
+
+### 验证安装成功
+
+在新会话里执行：
+
+```text
+mont_ping
+```
+
+期望返回：
+
+```json
+{
+  "ok": true,
+  "name": "mont-BidCopilot",
+  "toolCount": 21,
+  "dshEngineRange": ">=0.2.2-rc.1",
+  "storageRoot": "F:\\DSHDesktop\\dsh-home\\bidcopilot\\projects"
+}
+```
+
+`toolCount` 不是 21，或 `mont_ping` 调不到，说明没装好——先看第 1 条 `application` 状态。
+
+### 升级
+
+源码目录更新后，DSH 需重启加载新的 JavaScript 模块（插件代码不参与热更新）：
+
+```powershell
+# 1. 拉取新版本（若从 git 安装）
+git -C F:\DSHDesktop\chajian\mont-BidCopilot pull
+
+# 2. 重启 DSH
+# 3. 新会话里跑 mont_ping 确认 version 与 toolCount
+```
+
+`locale` 与 `docs` 是静态资源，Plugin Manager 按需读取，改完刷新插件页即可，不必重启。
+
+### 卸载
+
+```text
+plugin_manager remove_bundle target: dsh-mont-bidcopilot
+```
+
+卸载后 21 个工具与 `/bidcopilot-gate` 命令消失，文件写入停止。**已生成的项目目录保留在磁盘上**，不会删除；如需清理，手动删 `DSH_HOME/bidcopilot/projects` 下的对应目录。
+
+### 安装故障排查
+
+| 现象 | 原因 | 处理 |
+|---|---|---|
+| `EPERM ... node_modules\<包名>_tmp_*` | 该目录 ACL 损坏，pnpm 无法清扫 | 用管理员 PowerShell 对该目录执行 `takeown /f "<路径>"` 与 `icacls "<路径>" /reset`，或改用 junction 方式接入（见 CHANGELOG） |
+| `fiberPhase: failed`，诊断含 `reading 'validate'` | `Config` 未满足 Standard Schema 契约 | 本仓库已修复；若自定义改过 `Config`，需提供 `Config['~standard'].validate` |
+| `application: restart-required` | 该 profile 未开 HMR | 重启 DSH |
+| `mont_ping` 调不到但列表里有插件 | 未真正激活或工具注册失败 | 看插件行的 `fiberPhase` 与诊断信息 |
+| 装了但看不到图标/描述 | `locale` 或 `docs` 未被导出 | 确认 `package.json` 的 `exports` 含 `./locale/*.json`、`files` 含 `locale` 与 `docs` |
+
+### 目录与数据位置
+
+| 内容 | 位置 |
+|---|---|
+| 项目数据 | `DSH_HOME/bidcopilot/projects/<项目id>/`（可用配置 `dataDir` 覆盖） |
+| 每个项目 | `project.json`（索引）、`sections/*.md`（正文）、`tender/source.md`（招标原文）、`exports/*.docx` |
+| 配置覆盖 | profile 的 `cordis.patch.yml` 里 `id: mont-bidcopilot` 行的 `config` |
+
+## 使用方法
+
+### 一分钟上手：投标侧走一遍
+
+在 DSH 会话里按顺序说这几句，agent 会调用对应工具：
+
+**第 1 步 · 建项目**
+
+> 建一个投标项目，名字叫「XX市政务云平台投标」
+
+对应 `mont_project_create`。返回 `projectId`（例如 `XX-45823d`），后面所有命令都要带它。
+
+**第 2 步 · 解析招标文件**
+
+> 把这份招标文件解析一下：（粘贴正文）
+
+对应 `mont_bid_parse`，产出 18 项结构化字段、★ 实质性条款、评分表。返回里 `coverage` 是覆盖率（如 `11/18`），`missingFields` 列出没抽到的项——**这些不会编造，就是空的**。
+
+**第 3 步 · 生成评分对齐目录**
+
+> 按评分标准生成目录，全文目标 6 万字
+
+对应 `mont_bid_outline`。每个评分项映射成一章，按分值权重分配字数，★ 条款挂到必须响应它的章节。`unmappedStarClauses` 非空说明有 ★ 条款没找到归属章节，必须先补章节。
+
+**第 4 步 · 逐节写正文**
+
+> 先写第一章，主题是技术方案
+
+对应 `mont_bid_write_section`。一节一个文件，字数只受磁盘限制；要续写同一节传 `append: true`。返回 `sourceLabels` 统计 L1/L2/L3 标签数，`unlabeledRisk: true` 表示有外部引用但没打来源标签。
+
+**第 5 步 · 登记企业事实（关键）**
+
+> 把企业名称登记成「XX科技有限公司」，来源是人工录入
+
+对应 `mont_guard_verify_fact`。这一步**不能跳过**：
+
+- 业绩、资质、人员、企业名称只接受 `manual`（人工录入）或 `verified_kb`（已核验企业库）；传 `L2`/`web`/`model` 会被硬拒（`E_FACT_SOURCE_REJECTED`）
+- 值留空则状态为 `UNVERIFIED`，**会挡住导出**
+
+**第 6 步 · 锁定事实**
+
+> 锁定事实
+
+对应 `mont_bid_lock_facts`。返回 `blocked: true` 说明还有未核验项，`unverified` 列出具体是哪些。
+
+**第 7 步 · 雷同自检**
+
+> 检查一下正文和我们的模板像不像，再看和其他投标人像不像
+
+对应 `mont_guard_similarity_check`。两条规则两个阈值：与模板比（自复制，`0.85`）、与其他投标人比（围标预警，`0.65`）。超阈值就别硬导，先改写。
+
+**第 8 步 · 过门禁（必须由人做）**
+
+agent 做不到这一步——`mont_wf_advance` 对 `approve` 会硬拒。**你自己在输入框键入**：
+
+```text
+/bidcopilot-gate XX-45823d show
+/bidcopilot-gate XX-45823d approve gate2 你的名字
+/bidcopilot-gate XX-45823d approve gate3 你的名字
+```
+
+`show` 先看清三门状态；`approve` 时若有未核验事实会被拒（`E_GATE_UNRESOLVED_ITEMS`），按提示补。
+
+**第 9 步 · 导出**
+
+> 导出标书，文件名 XX市政务云投标.docx
+
+对应 `mont_bid_export`。前置五道检查任一不过就拒绝导出，并列出 `blockers`：
+
+| 阻断码 | 含义 | 怎么解 |
+|---|---|---|
+| `E_UNVERIFIED_FACTS` | 有未核验事实 | 回去第 5 步补，或标不适用 |
+| `E_GATE2_NOT_APPROVED` | 门2 未批 | 人键入 `/bidcopilot-gate ... approve gate2 名字` |
+| `E_GATE3_NOT_APPROVED` | 门3 未批 | 同上 |
+| `E_SELF_DUPLICATION` | 与模板太像 | 实质性改写 |
+| `E_COLLUSION_RISK` | 与其他投标人太像 | 实质性改写 |
+
+导出成功返回 `.docx` 的绝对路径与字节数。
+
+### 招标侧走一遍
+
+**第 1 步 · 需求结构化**
+
+> 我要采购一套政务云平台，预算 500 万，工期 12 个月，需要支持 5000 并发
+
+对应 `mont_tender_parse`。抽不到的字段列入 `missingFields` 并标「待招标人补充」，**不臆造**。
+
+**第 2 步 · 匹配行业骨架**
+
+> 这是什么行业，用哪套章节结构
+
+对应 `mont_tender_match_industry`。8 个行业 + 通用回退；`confidence` 低于 0.3 会回退 `general` 并提示骨架待补充。
+
+**第 3 步 · 逐节生成草案**
+
+> 写资格条件这一节：投标人须具有独立法人资格
+
+对应 `mont_tender_draft_section`。**这一步会先过 T-B1~T-B5 硬阻断**：
+
+- 命中 → 返回 `generated: false`、`blockedBy: "T-B1"`、`content: null`，**根本不给你条款文本**
+- 未命中 → 正常生成，并附 `mandatoryReview` 复核项
+
+试一下拦截效果，输入「投标人须在本市设有分支机构」，会看到 `blockedBy: T-B1` 和法条依据。
+
+**第 4 步 · 跨板块一致性**
+
+> 检查一下预算、工期、评审办法有没有矛盾
+
+对应 `mont_tender_check_consistency`。只输出「待确认」，**不自动改**——改是人的决定。
+
+**第 5 步 · 过门禁并导出**
+
+```text
+/bidcopilot-gate <项目id> show
+/bidcopilot-gate <项目id> approve gate1 你的名字
+```
+
+门1 是招标侧的资格与评审办法确认。
+
+### 单独查一条条款是否违规
+
+不需要建项目，直接问：
+
+> 检查这条资格条件：投标人须具备本省业绩，且在本市缴纳社保
+
+对应 `mont_guard_check_clause`。一次可命中多条规则，每条给出**原文证据**、规则编号、法条依据：
+
+```json
+{
+  "blocked": true,
+  "blockedBy": "T-B2",
+  "hits": [
+    { "ruleId": "T-B2", "evidence": "投标人须具备本省业绩", "legalBasis": "《招标投标法实施条例》第三十二条第（二）项" },
+    { "ruleId": "T-B3", "evidence": "在本市缴纳社保", "legalBasis": "..." }
+  ]
+}
+```
+
+未命中**不代表条款合法**——规则只做保守拦截，最终判断由人作出。
+
+### 查事实来源规则
+
+> 业绩字段能用联网搜索的结果填吗
+
+对应 `mont_guard_source_policy`，返回 9 类字段各自允许与禁止的来源。
+
+### 门禁命令速查
+
+```text
+/bidcopilot-gate <项目id> show                          # 看三门状态与审计链
+/bidcopilot-gate <项目id> approve <gate1|gate2|gate3> <操作人>    # 批准
+/bidcopilot-gate <项目id> reject  <gate1|gate2|gate3> <操作人> <备注>  # 拒绝（会冻结工作流）
+```
+
+- 操作人**必填**，会写进审计链
+- 同一门只能裁一次，重复裁决报 `E_GATE_ALREADY_DECIDED`
+- 拒绝后工作流冻结，后续任何门都不能再批（`E_WORKFLOW_FROZEN`）
+
+### 创建知识库资料目录（可选）
+
+要让 `mont_kb_search` 可用，需在配置里指定 `kbDir`：
+
+```yaml
+- id: mont-bidcopilot
+  name: 'dsh-mont-bidcopilot'
+  config:
+    kbDir: 'F:\你的企业资料目录'
+```
+
+然后：
+
+> 用知识库查一下农药追溯二维码的政策要求
+
+**门控是 fail-closed 的**：没在消息里点名（或没传 `explicit: true`）就不检索，会返回可读的拒绝理由。这是设计，不是错误。
+
+### 常见问题
+
+**Q：为什么 agent 不能帮我批准门禁？**
+门禁的作用就是挡住 agent。批准只存在于 `/bidcopilot-gate` 命令与 Host 服务里，凭证由插件内部构造，不出现在任何工具参数中。
+
+**Q：`mont_wf_advance` 能做什么？**
+只能 `status`（看状态）和 `check`（判断某门能否放行）。传 `approve`/`reject`/`sign` 一律硬拒。
+
+**Q：为什么业绩不能从网上搜？**
+因为那是别家企业的业绩。填进自己标书属提供虚假材料，法律责任由投标人承担。代码层直接拒绝，不是靠提示词约束。
+
+**Q：审计链能不能事后改？**
+每条记录含自封签哈希与前驱哈希，改任何一条（含最后一条）都会被 `verifyAuditChain` 发现。`mont_project_status` 会返回 `auditChain.valid`。
+
+**Q：项目丢了怎么办？**
+项目就是磁盘上的目录，`project.json` + `sections/*.md`。中断后下次 `mont_project_status` 就能从磁盘继续。
 
 ## 三条不可逾越的边界
 
