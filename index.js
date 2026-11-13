@@ -360,9 +360,12 @@ export function apply(ctx, rawConfig = {}) {
             credential: hostSurface.hostCredential(),
           })
           if (result.ok !== true) return { kind: 'error', text: `裁决失败：${result.error.code} — ${result.error.message}` }
+          // 审计链同时含写入活动记录，全局 seq 不等于"第几次门禁裁决"。
+          // 对人报"门禁序号"，并附全局位置，避免出现"第一次裁决显示 seq 7"这种困惑。
+          const gateSeq = await runtime.gateDecisionSeq(projectId, result.record.gateId)
           return {
             kind: 'success',
-            text: `已记录：${result.record.gateTitle} ${result.record.decision} by ${result.record.operator}（seq ${result.record.seq}，摘要 ${result.record.subjectDigest.slice(0, 23)}…）`,
+            text: `已记录：${result.record.gateTitle} ${result.record.decision} by ${result.record.operator}（门禁序号 ${gateSeq}，链上位置 seq ${result.record.seq}，摘要 ${result.record.subjectDigest.slice(0, 23)}…）`,
           }
         } catch (error) {
           return { kind: 'error', text: `命令执行失败：${error instanceof Error ? error.message : String(error)}` }

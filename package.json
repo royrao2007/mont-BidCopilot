@@ -1,7 +1,7 @@
 {
   "name": "dsh-mont-bidcopilot",
-  "version": "0.1.3",
-  "description": "Dual-mode tender and bid drafting engine for DeepSeek Harness. Registers 21 directly callable mont_* tools with code-enforced compliance rules (T-B1 to T-B5), a fact-source allowlist, three human gates with a tamper-evident audit chain, score-aligned outlining, dual-threshold similarity checks, and pure-JS .docx export. No network access, no subprocesses, no install-time scripts.",
+  "version": "0.2.0",
+  "description": "Dual-mode tender and bid drafting engine for DeepSeek Harness. Registers 24 directly callable mont_* tools with code-enforced compliance rules (T-B1 to T-B5), an offline Chinese policy library for clause grounding, a fact-source allowlist, three human gates with a tamper-evident audit chain, score-aligned outlining, dual-threshold similarity checks, and pure-JS .docx export. No network access, no subprocesses, no install-time scripts.",
   "license": "MIT",
   "author": {
     "name": "mont",

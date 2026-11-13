@@ -23,7 +23,7 @@ import {
   verifyAuditChain,
 } from '../lib/workflow.js'
 import { createRuntime } from '../lib/runtime.js'
-import { setFact } from '../lib/facts.js'
+import { setFact, verifyFact } from '../lib/facts.js'
 
 const HOST_CRED = { channel: 'host-ui' }
 
@@ -164,13 +164,14 @@ test('门禁｜存在 UNVERIFIED 事实时导出被阻断', async () => {
 test('门禁｜写入未核验事实后项目状态显示不可导出', async () => {
   await withProject(async (runtime, projectId) => {
     const project = await runtime.store.readProject(projectId)
+    // manual 录入均为 UNVERIFIED（录入 ≠ 核验）；显式核验后才转 VERIFIED。
     setFact(project, { key: 'performanceCommitment', value: '9999', source: 'manual' })
-    // 上面这条是 manual 且非空 → VERIFIED；再造一条空值事实 → UNVERIFIED
-    setFact(project, { key: 'creditCode', value: '', source: 'manual' })
+    setFact(project, { key: 'creditCode', value: '91110000MA00000001', source: 'manual' })
+    verifyFact(project, 'performanceCommitment', { operator: 'tester' })
     await runtime.store.updateProject(projectId, { facts: project.facts })
 
     const status = await runtime.projectStatus(projectId)
-    assert.equal(status.facts.unverified.length, 1)
+    assert.equal(status.facts.unverified.length, 1, '仅未核验的那一条计入未核验')
     assert.equal(status.canExport, false)
   })
 })
@@ -206,6 +207,9 @@ test('门禁｜事实全部核验且门2门3批准后才允许导出', async () 
     const project = await runtime.store.readProject(projectId)
     setFact(project, { key: 'enterpriseName', value: '测试科技有限公司', source: 'manual' })
     setFact(project, { key: 'creditCode', value: '91110000MA00000001', source: 'manual' })
+    // manual 录入 ≠ 核验：必须补一次显式核验（带 operator）才允许放行。
+    verifyFact(project, 'enterpriseName', { operator: 'tester' })
+    verifyFact(project, 'creditCode', { operator: 'tester' })
     await runtime.store.updateProject(projectId, { facts: project.facts })
 
     await runtime.approveGateFromHost(projectId, {
