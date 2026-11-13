@@ -206,6 +206,27 @@ agent 做不到这一步——`mont_wf_advance` 对 `approve` 会硬拒。**你�
 
 导出成功返回 `.docx` 的绝对路径与字节数。
 
+### 自然语言如何触发这些工具
+
+用户说「帮我写一份 XX 招标文件」时，**插件本身不做任何关键词匹配**——它没有 skills provider，也没有自己的路由层。触发链路是：
+
+1. **宿主把 24 个工具的 name + description 放进模型上下文**（Cordis 的 `ctx.tools.register` 已经完成了这一步）。
+2. **模型读 description 判断该调哪个工具**，按 description 里的约束决定顺序（例如「先 mont_project_list 避免重复建项」）。
+3. **模型调用工具，宿主执行**，把 JSON 结果回灌给模型，模型据此决定下一步。
+
+也就是说：**路由发生在模型的推理里，不在插件的代码里**。这带来两个可预期的结果——
+
+- 同一个需求，不同模型的首次调用可能不同（可能先 `mont_tender_parse`，也可能先 `mont_project_create`）。两者都合理，因为 `mont_project_create` 支持 `tenderText` 参数一次落库。
+- 模型如果没读全 description，可能漏掉 `mont_tender_draft_section` 的硬阻断语义而试图跳过它直接写正文。插件无法阻止这种跳过，但它保证：**任何一笔写入都只能经工具发生**，而没有工具能产出绕过 T-B 规则的条款文本。
+
+因此「自然语言自动调起插件」的前提是宿主已装载本插件（`mont_ping` 能调到即已装载）。插件被停用时，这些 description 不在上下文里，模型不会再想到它们。
+
+**若希望每次都稳定走同一套顺序**，在消息里点名即可，例如：
+
+> 用 mont-BidCopilot 写一份 XX 招标文件，按 parse → match_industry → draft_section 的顺序走
+
+这不是必须的，但能消除模型自由选择先后带来的不确定性。
+
 ### 招标侧走一遍
 
 **第 1 步 · 需求结构化**
