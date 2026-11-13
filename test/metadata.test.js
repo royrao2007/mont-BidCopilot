@@ -320,6 +320,38 @@ test('市场｜market/index.json 是合法的 format-1 索引且与 package.json
   assert.ok(pkg.files.includes('market'), 'package.json#files 必须包含 market')
 })
 
+test('市场｜DISTRIBUTION.md 记录的版本与清单和索引一致', () => {
+  const doc = read('DISTRIBUTION.md')
+  const pkg = JSON.parse(read('package.json'))
+  const market = JSON.parse(read('market/index.json'))
+
+  // 文档给出的 latest 版本必须与 package.json 一致，否则跟进时会照错版本
+  assert.ok(
+    doc.includes(`**${pkg.version}**`),
+    `DISTRIBUTION.md 应把当前版本 ${pkg.version} 标为 latest`,
+  )
+  assert.ok(doc.includes(pkg.name), 'DISTRIBUTION.md 应写明 npm 包名')
+  assert.ok(
+    doc.includes('https://github.com/royrao2007/mont-BidCopilot'),
+    'DISTRIBUTION.md 应写明仓库地址',
+  )
+
+  // 文档里列出的自建索引地址必须与真实可访问产物一致
+  const indexUrlInDoc = 'https://cdn.jsdelivr.net/npm/dsh-mont-bidcopilot/market/index.json'
+  assert.ok(doc.includes(indexUrlInDoc), 'DISTRIBUTION.md 应给出自建索引的订阅地址')
+  assert.equal(market.plugins[0].versions[0].version, pkg.version, '市场索引版本须与清单一致')
+
+  // 必须覆盖四个渠道，缺一个就会漏跟进
+  for (const channel of ['npm 官方源', 'dsh-plugin-catalog', 'jsDelivr', 'GitHub raw']) {
+    assert.ok(doc.includes(channel), `DISTRIBUTION.md 缺少渠道：${channel}`)
+  }
+
+  // 发版清单必须完整，避免漏步骤
+  for (const step of ['npm publish', 'git push', 'node --test', 'publishTimestamp']) {
+    assert.ok(doc.includes(step), `发版清单缺少步骤：${step}`)
+  }
+})
+
 test('元数据｜插件显示名统一为英文 mont-BidCopilot，不用中文别名', () => {
   // 插件在 Plugin Manager 里显示的名字来自 locale 的 meta.title。
   for (const file of ['locale/en.json', 'locale/zh.json']) {
