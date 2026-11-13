@@ -37,59 +37,40 @@ mont-BidCopilot 是招投标双模辅助编制引擎，DeepSeek Harness（DSH）
 | Node.js | `>=22.5.0` | `node -v` |
 | 第三方依赖 | **无需安装**（运行时零依赖） | — |
 
-### 方式一：从 GitHub 安装（推荐，任何人可用）
+### 方式一：图形界面安装（推荐）
 
-公网仓库：**https://github.com/royrao2007/mont-BidCopilot**
+1. 打开 DSH 左侧栏 **插件**；
+2. 点右上角 **添加插件**；
+3. 在输入框里填 **npm 包名**（就这一串，不要加任何命令前缀）：
 
-在 DSH 会话里让插件管理器直接从 GitHub 拉取，`target` 填 git 地址：
+   ```text
+   dsh-mont-bidcopilot
+   ```
 
-```text
-plugin_manager install_bundle target: github:royrao2007/mont-BidCopilot
-```
+4. 安装源选 **npm 官方源**（默认即可）；
+5. 点 **安装**，等待完成；
+6. 如果提示需要重启，重启 DSH；
+7. 安装后插件行应显示「mont-BidCopilot」，图标为蓝底文档 + 绿色勾。
 
-或直接说一句，agent 会自己调：
+> 常见错误：把 `plugin_manager install_bundle target: ...` 整行粘进输入框 —— 那是 agent 的内部工具调用语法，输入框只认包名或仓库地址，会报「无法识别这个包名或地址」。
 
-> 从 `github:royrao2007/mont-BidCopilot` 装 mont-BidCopilot 插件
+### 方式二：在会话里让 agent 安装
 
-也可以用完整 URL：
+直接对 DSH 说一句，agent 会自己调用安装工具：
 
-```text
-plugin_manager install_bundle target: https://github.com/royrao2007/mont-BidCopilot.git
-```
+> 安装 npm 包 dsh-mont-bidcopilot
 
-**成功判据**（三条都要满足，缺一不算装好）：
-
-1. 返回里 `application` 为 `applied`，或提示 `restart-required`（profile 未开 HMR 时正常）；
-2. 插件列表出现 `include:mont-bidcopilot`，`fiberPhase` 为 `active`；
-3. 新会话里 `mont_ping` 能调通，返回 `toolCount: 21`。
-
-`restart-required` 表示改动未生效，**重启 DSH** 后再验证第 2、3 条。
-
-### 方式二：从本地克隆安装（开发者）
-
-已把仓库克隆到本机时，`target` 填**你本机**的克隆路径（下面只是示例，换成你自己的目录）：
-
-```powershell
-git clone https://github.com/royrao2007/mont-BidCopilot.git D:\plugins\mont-BidCopilot
-```
-
-```text
-plugin_manager install_bundle target: D:\plugins\mont-BidCopilot
-```
-
-本地目录方式的好处是改代码后重启 DSH 即生效，适合二次开发。
-
-### 方式三：图形界面安装
-
-1. 打开 DSH 左侧栏 **Plugins**（插件）；
-2. 点 **Add plugin**（添加插件）；
-3. 填写 git 地址 `github:royrao2007/mont-BidCopilot`，或选择你本机的克隆目录；
-4. 安装后确认插件行出现「mont-BidCopilot」，图标为蓝底文档 + 绿色勾；
-5. 如果状态提示需要重启，重启 DSH。
+`plugin_manager ...` 这类命令由 agent 自己生成，不需要你手写。
 
 安装后可在插件详情页看到中英文标题、描述、权限说明和示意图（`locale/en.json`、`locale/zh.json`、`docs/DETAIL.md`）。
 
 ### 验证安装成功
+
+**成功判据**（三条都要满足，缺一不算装好）：
+
+1. 插件列表出现 `include:mont-bidcopilot`，状态 `fiberPhase` 为 `active`；
+2. 新会话里 `mont_ping` 能调通；
+3. 返回里 `toolCount` 为 `21`。
 
 在新会话里执行：
 
@@ -109,33 +90,22 @@ mont_ping
 }
 ```
 
-`toolCount` 不是 21，或 `mont_ping` 调不到，说明没装好——先看第 1 条 `application` 状态。
+`toolCount` 不是 21，或 `mont_ping` 调不到，说明没装好——先看第 1 条 `fiberPhase` 状态。
 
 ### 升级
 
-更新后 DSH 需重启加载新的 JavaScript 模块（插件代码不参与热更新）：
+插件代码不参与热更新，更新后需重启 DSH：
 
-```powershell
-# 1. 拉取新版本（换成你自己的克隆目录；从 git 直装的话可让插件管理器重装）
-git -C <你的克隆目录> pull
-
-# 2. 重启 DSH
-# 3. 新会话里跑 mont_ping 确认 version 与 toolCount
-```
-
-重新安装也可直接覆盖：
-
-```text
-plugin_manager install_bundle target: github:royrao2007/mont-BidCopilot
-```
+1. 在 **插件** 页对该插件点卸载；
+2. 用与安装相同的方式重新安装；
+3. 重启 DSH；
+4. 新会话里跑 `mont_ping` 确认 `version` 与 `toolCount`。
 
 `locale` 与 `docs` 是静态资源，Plugin Manager 按需读取，改完刷新插件页即可，不必重启。
 
 ### 卸载
 
-```text
-plugin_manager remove_bundle target: dsh-mont-bidcopilot
-```
+在 **插件** 页找到「mont-BidCopilot」，点卸载即可；也可让 agent 执行卸载。
 
 卸载后 21 个工具与 `/bidcopilot-gate` 命令消失，文件写入停止。**已生成的项目目录保留在磁盘上**，不会删除；如需清理，手动删 `DSH_HOME/bidcopilot/projects` 下的对应目录。
 

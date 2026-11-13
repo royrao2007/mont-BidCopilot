@@ -60,12 +60,23 @@ for (const file of TARGETS) {
   }
 }
 
-// 正向检查：README 必须给出公网 git 安装地址
+// 正向检查：README 必须给出可直接在插件页输入框使用的 npm 包名
 const readme = readFileSync(join(root, 'README.md'), 'utf8')
-const hasGitInstall = readme.includes('github:royrao2007/mont-BidCopilot')
-  || readme.includes('https://github.com/royrao2007/mont-BidCopilot.git')
-console.log(`\n${hasGitInstall ? 'PASS' : 'FAIL'}  README 提供公网 git 安装地址`)
-if (!hasGitInstall) failures += 1
 
-console.log(`\n${failures === 0 ? '全部通过：文档中无本机专属路径' : `失败 ${failures} 项`}`)
+const packageName = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).name
+const hasNpmInstall = readme.includes(packageName)
+console.log(`\n${hasNpmInstall ? 'PASS' : 'FAIL'}  README 给出 npm 包名（${packageName}）可供安装`)
+if (!hasNpmInstall) failures += 1
+
+// 反向检查：不得把 agent 的内部工具调用语法当成输入框内容
+const installSection = (() => {
+  const start = readme.indexOf('### 方式一')
+  const end = readme.indexOf('### 验证安装成功')
+  return start === -1 || end === -1 ? '' : readme.slice(start, end)
+})()
+const mistakenSyntax = /```(?:text)?\s*plugin_manager install_bundle target:/u.test(installSection)
+console.log(`${mistakenSyntax ? 'FAIL' : 'PASS'}  安装步骤未把 plugin_manager 调用语法当作输入内容`)
+if (mistakenSyntax) failures += 1
+
+console.log(`\n${failures === 0 ? '全部通过：文档中无本机专属路径，安装说明可直接照抄' : `失败 ${failures} 项`}`)
 process.exit(failures === 0 ? 0 : 1)

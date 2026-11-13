@@ -204,20 +204,36 @@ test('文档｜发布文档不得包含本机专属路径（别人没有 F 盘�
   assert.equal(failed, false, `发布文档含本机专属路径：\n${output}`)
 })
 
-test('文档｜README 安装说明使用公网 git 地址而非本机绝对路径', () => {
+test('文档｜README 安装说明使用 npm 包名，不用本机路径或 agent 工具语法', () => {
   const readme = read('README.md')
 
-  // 别人能照抄的形式
+  // 图形界面输入框只认包名/仓库地址，因此主路径必须是 npm 包名
+  assert.ok(readme.includes('dsh-mont-bidcopilot'), 'README 必须给出 npm 包名')
   assert.ok(
-    readme.includes('github:royrao2007/mont-BidCopilot')
-      || readme.includes('https://github.com/royrao2007/mont-BidCopilot.git'),
-    'README 必须给出公网 git 安装地址',
+    readme.includes('dsh-mont-bidcopilot'),
+    'README 安装说明须可用 npm 包名安装',
   )
-  assert.ok(readme.includes('https://github.com/royrao2007/mont-BidCopilot'), 'README 必须给出仓库公网 URL')
 
-  // 本地克隆路径只作为"换成你自己的目录"的示例出现，且不得是作者机器路径
+  // 不得把 agent 的内部工具调用语法当作输入框内容
+  const installBlock = readme.slice(readme.indexOf('### 方式一'), readme.indexOf('### 验证安装成功'))
+  assert.equal(
+    /```(?:text)?\s*plugin_manager install_bundle target:/u.test(installBlock),
+    false,
+    '安装步骤不得把 plugin_manager 调用语法当成输入框内容',
+  )
+
+  // 不得出现作者本机路径
   assert.equal(/F:\\DSHDesktop|F:\\deepseek harness/u.test(readme), false, 'README 不得出现作者本机路径')
   assert.equal(/[A-Za-z]:\\chajian/u.test(readme), false, 'README 不得出现作者本机目录名')
+})
+
+test('文档｜README 说明 npm 安装源与包名格式', () => {
+  const readme = read('README.md')
+  assert.ok(/npm/.test(readme), 'README 应说明通过 npm 安装')
+  assert.ok(
+    /npm 官方源|registry\.npmjs\.org/u.test(readme),
+    'README 应说明安装源为 npm 官方源',
+  )
 })
 
 test('元数据｜插件显示名统一为英文 mont-BidCopilot，不用中文别名', () => {
@@ -234,7 +250,7 @@ test('元数据｜插件显示名统一为英文 mont-BidCopilot，不用中文�
   // 安装文档里让用户核对的名字也必须是英文
   const readme = read('README.md')
   assert.ok(
-    readme.includes('插件行出现「mont-BidCopilot」'),
+    readme.includes('插件行应显示「mont-BidCopilot」'),
     '安装步骤中的核对名称应为 mont-BidCopilot',
   )
 
@@ -305,9 +321,8 @@ test('文档｜README 的安装章节包含完整步骤（要求、安装、验�
   assert.ok(readme.includes('## 安装'), '缺安装章节')
   const required = [
     '### 环境要求',              // 版本与依赖前提
-    '### 方式一：从 GitHub 安装', // 公众可照抄的主路径
-    '### 方式二：从本地克隆安装', // 开发者路径
-    '### 方式三：图形界面安装',   // 界面操作
+    '### 方式一：图形界面安装',   // 普通用户主路径（插件页输入框）
+    '### 方式二：在会话里让 agent 安装', // 让 agent 代劳
     '### 验证安装成功',          // 装完怎么确认
     '### 升级',                 // 后续怎么更新
     '### 卸载',                 // 怎么移除且数据留痕
