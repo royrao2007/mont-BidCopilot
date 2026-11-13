@@ -8,3 +8,8 @@ mont-BidCopilot实施方案.md
 # 测试与调试产物
 *.tmp
 *.log
+
+_msg.txt
+_*.mjs
+_*.ps1
+
