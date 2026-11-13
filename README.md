@@ -491,6 +491,6 @@ node --test 'test/*.test.js'
 
 ## 许可证
 
-MIT。上游归因见 [NOTICE.md](NOTICE.md)——含一个必须按 AGPL 处理、因此**不吸收任何源码**的组件（BidMaster-Pro，其 LICENSE 正文为 AGPL v3 而 README 标 MIT，取从严解释）。
+MIT。上游组件的归因与许可证处理见 [NOTICE.md](NOTICE.md)。
 
 安全披露见 [SECURITY.md](SECURITY.md)。

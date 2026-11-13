@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 0.1.2 — 2026-11-13
+
+README 许可证章节不再展开 AGPL 排除细节，只保留一句 MIT 与指向 NOTICE.md；具体排除记录与许可证核对依据留在 NOTICE.md（合规义务需要保留）。
+
+同时修正 NOTICE.md 三处不实陈述：原文声称存在 data/review-checklists/ 目录并据此说明许可证边界，但该目录并不存在（本包也未实现废标项专项检查工具）。改为如实列出实际存在的两个数据文件。
+
+新增两个检查器并接入测试：
+- scripts/check-claimed-paths.mjs：校验文档中声称的路径真实存在
+- README 许可证章节断言不出现 AGPL / BidMaster 字样
+
 ## 0.1.1 — 2026-11-13
 
 安装说明修正：图形界面「添加插件」的输入框只认 npm 包名，原文档给的 plugin_manager install_bundle target: ... 是 agent 内部调用语法，贴进输入框会报「无法识别这个包名或地址」。改为填 dsh-mont-bidcopilot 并选 npm 官方源；删除「从本地克隆安装」（其他用户没有源码）；恢复三条可观察的成功判据。

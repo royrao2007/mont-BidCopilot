@@ -236,6 +236,48 @@ test('文档｜README 说明 npm 安装源与包名格式', () => {
   )
 })
 
+test('文档｜README 许可证章节不展开 AGPL 排除细节，只指向 NOTICE', () => {
+  const readme = read('README.md')
+
+  // 面向使用者的 README 保持简洁：一句 MIT + 指向 NOTICE 即可。
+  const licenseSection = readme.slice(readme.indexOf('## 许可证'))
+  assert.ok(licenseSection.length > 0, 'README 缺许可证章节')
+  assert.ok(/MIT/u.test(licenseSection), '许可证章节须写明 MIT')
+  assert.ok(licenseSection.includes('NOTICE.md'), '许可证章节须指向 NOTICE.md')
+
+  // 具体排除理由与某个组件的许可证矛盾属于合规记录，放在 NOTICE。
+  assert.equal(
+    /BidMaster/u.test(licenseSection),
+    false,
+    'README 许可证章节不应点名展开上游组件的许可证争议',
+  )
+  assert.equal(
+    /AGPL/u.test(licenseSection),
+    false,
+    'README 许可证章节不应展开 AGPL 排除细节',
+  )
+
+  // 但 NOTICE.md 必须保留该排除记录，这是许可证合规义务。
+  const notice = read('NOTICE.md')
+  assert.ok(/AGPL/u.test(notice), 'NOTICE.md 须保留 AGPL 排除记录')
+  assert.ok(/BidMaster/u.test(notice), 'NOTICE.md 须保留被排除组件名')
+})
+
+test('文档｜文档声称存在的路径必须真实存在（不许写不存在的文件）', async () => {
+  const { execFileSync } = await import('node:child_process')
+  const script = join(root, 'scripts', 'check-claimed-paths.mjs')
+
+  let output = ''
+  let failed = false
+  try {
+    output = execFileSync(process.execPath, [script], { encoding: 'utf8' })
+  } catch (error) {
+    failed = true
+    output = `${error.stdout ?? ''}${error.stderr ?? ''}`
+  }
+  assert.equal(failed, false, `文档声称了不存在的路径：\n${output}`)
+})
+
 test('元数据｜插件显示名统一为英文 mont-BidCopilot，不用中文别名', () => {
   // 插件在 Plugin Manager 里显示的名字来自 locale 的 meta.title。
   for (const file of ['locale/en.json', 'locale/zh.json']) {

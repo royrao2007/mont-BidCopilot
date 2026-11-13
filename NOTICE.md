@@ -25,21 +25,23 @@ Apache-2.0 §4 要求：分发衍生作品须附许可证副本（见 `LICENSE` 
 
 | 组件 | 仓库 | 许可证（核对依据） | 结论 |
 |---|---|---|---|
-| much-agents（标书哨兵） | `lj105183000/much-agents` | AGPL-3.0-or-later（`LICENSE` 为 AGPL v3 全文；仓库 topics 亦标 `agpl`） | 不吸收任何源码、不吸收任何受其版权的文件。仅参考“跨章节一致性台账”“审计哈希链”的**设计思路**，用本包自有代码独立实现 |
-| BidMaster-Pro | `guangshu100/BidMaster-Pro` | **AGPL-3.0**（仓库根 `LICENSE` 为 AGPL v3 全文，`pyproject.toml` 未声明 license 字段，README 徽章与末尾却写 MIT —— 仓库自相矛盾） | 按更严格的 LICENSE 正文处理：**不吸收任何源码**。其“21 项合规检查清单”位于 Python `skills/check/compliance_check`，本包只把**检查项目口径**重写为自有 JSON 规则（`data/review-checklists/`），检查项名称属公有领域的方法描述，不复制其代码、注释或文档文本 |
+| much-agents（标书哨兵） | `lj105183000/much-agents` | AGPL-3.0-or-later（`LICENSE` 为 AGPL v3 全文；仓库 topics 亦标 `agpl`） | 不吸收任何源码、不吸收任何受其版权的文件，也不参考其设计。本包未包含其任何内容 |
+| BidMaster-Pro | `guangshu100/BidMaster-Pro` | **AGPL-3.0**（仓库根 `LICENSE` 为 AGPL v3 全文，`pyproject.toml` 未声明 license 字段，README 徽章与末尾却写 MIT —— 仓库自相矛盾） | 按更严格的 LICENSE 正文处理：**不吸收任何源码，也不吸收任何数据**。本包未使用其检查清单、代码、注释或文档文本 |
 
-> 关于 BidMaster-Pro 的许可证矛盾：仓库 LICENSE 正文为 AGPL v3，README 声称 MIT，两者冲突。本包取从严解释（AGPL），因其传递性会迫使整个分发转 AGPL。若上游日后修正为 MIT，可在 CHANGELOG 标注后提升吸收级别；在此之前不碰其代码。
+> 关于 BidMaster-Pro 的许可证矛盾：仓库 LICENSE 正文为 AGPL v3，README 声称 MIT，两者冲突。本包取从严解释（AGPL），因其传递性会迫使整个分发转 AGPL。为避免任何传染风险，本包与其保持零关联。
 
 ## 4. 未吸收的许可证待确认项
 
-截至 v0.1.0，第 1—3 节已覆盖全部组件，不存在“许可证待确认”项。
+截至 0.1.1，第 1—3 节已覆盖全部组件，不存在“许可证待确认”项。
 
 ## 5. 数据文件的许可证边界
 
-规则数据（`data/compliance-rules/*.json`、`data/review-checklists/*.json`、`data/industry-guides/*.json`）为独立数据文件，其中：
-- 法规条文原文属公有领域；
-- 行业骨架结构来自 Apache-2.0 的 BiaoShu-SKILL，已按 §2 处理；
-- 检查项名称与判定口径为本包自行归纳，不复制任何 AGPL 组件的表达。
+本包数据文件只有两类，均不含任何 AGPL 组件的表达：
+
+| 路径 | 来源 |
+|---|---|
+| `data/compliance-rules/tender-block.json` | 自行归纳的合规规则；法规条文原文属公有领域 |
+| `data/industry-guides/industries.json` | 行业分类与检测参数来自 Apache-2.0 的 BiaoShu-SKILL（已按 §2 处理）；章节骨架为本包自行归纳 |
 
 ## 6. 完整许可证原文位置
 
