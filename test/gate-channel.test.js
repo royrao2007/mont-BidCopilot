@@ -120,7 +120,9 @@ test('人机通道｜工具清单中不存在任何批准/拒绝/签署工具', 
     // 必须等到异步内核自检完成、工具注册结束。
     assert.ok(host.tools.size > 0, '工具应已注册')
     const names = [...host.tools.keys()]
-    const approvalLike = names.filter(name => /approve|reject|sign|批准|签署|agree/iu.test(name))
+    // 用词边界匹配，避免把 mont_bid_rejection_*（废标检查）误判成批准类工具。
+    // 门禁裁决动词是独立词或紧邻下划线边界，工具名里含 reject 子串不等于有批准能力。
+    const approvalLike = names.filter(name => /(?:^|[_:])(?:approve|reject|sign|agree)(?:$|[_:])|批准|签署/iu.test(name))
     assert.deepEqual(approvalLike, [], `不应存在批准类工具，实际：${approvalLike.join(',')}`)
     assert.ok(names.includes('mont_wf_advance'), '只保留状态查询与推进检查')
   })
