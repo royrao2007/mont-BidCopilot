@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## 0.4.0 — 2026-11-14
+
+工具数 27 → 32。落地竞品对比后剩余的三项优化，均为自有确定性代码，不引入新依赖。
+
+### ① 结构化检查报告 + 可确认清单
+
+`preExportCheck` 在原有 `blockers[]` 之外新增 `report`：
+每条阻断项带 `code / severity / evidence / suggestion / acknowledged`，按 high/medium/low 分级。
+`mont_bid_export` 新增 `acknowledged` 参数——确属误报的项经人确认后不阻断导出，**但仍保留在报告中**；高严重度门禁项不在确认列表时依旧阻断。报告落盘到 `project.json#exportCheck`，检查动作写入审计链（`bid:exportCheck`）。
+新增 `mont_bid_check_report` 读取落盘报告；未导出过时给出即时空报告，不臆造历史。
+
+### ② 多标段 / 多阶段
+
+`PARSE_FIELDS` 从 18 项扩到 20 项，新增 `lots`（标段/包号）与 `stages`（投标阶段）。
+`extractLots` 支持「标段一/标段二」显式枚举与「共分 3 个标段」按数量生成占位名，抽不到返回空数组不臆造。
+`parseBidTender` 输出 `lots / lotCount`；`planOutline` 检测到标段时生成 `byLot` 分组目录，章节 id 带标段前缀，供逐标段写作。
+顺带修一处静默漏抽：`takeField` 原先只取 `match[1]`，无捕获组的字段恒为 null；现回退到 `match[0]`。
+
+### ③ 任务进度落盘
+
+新增 `lib/task.js` + 4 个工具：`mont_task_create` / `mont_task_update` / `mont_task_list` / `mont_task_status`。
+任务落在 `project.json#tasks`，显式状态枚举（PENDING/RUNNING/SUCCEEDED/FAILED/CANCELED），支持 done/increment/total、终态保护与 force 重启、按 kind/status 过滤、总体进度与「可恢复任务 id」清单。三次任务动作均写入审计链。纯文件系统，不启动后台进程、不引入 SQLite。
+
+### 测试
+
+新增 `test/optimization.test.js`（19 条），更新 functional 测试的覆盖率断言（18→20 项）与 metadata 测试的工具数断言（27→32）。全套 **216 条通过**。
+
 ## 0.3.0 — 2026-11-14
 
 工具数 24 → 27。新增**废标项 / 响应完整性检查**（投标侧），补齐与同领域开源项目相比最明显的能力缺口。

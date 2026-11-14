@@ -93,12 +93,12 @@ const TENDER_SAMPLE = `项目名称：XX市政务云平台建设项目
 ★ 未按要求密封的投标文件将被否决
 质保期：3 年`
 
-test('功能｜18 项解析抽出字段并给出覆盖率', () => {
+test('功能｜20 项解析抽出字段并给出覆盖率', () => {
   const parsed = parseBidTender(TENDER_SAMPLE)
   assert.equal(parsed.ok, true)
   assert.equal(parsed.fields.projectName.value, 'XX市政务云平台建设项目')
   assert.match(parsed.fields.budget.value, /500/u)
-  assert.match(parsed.coverage, /^\d+\/18$/u)
+  assert.match(parsed.coverage, /^\d+\/20$/u)
   assert.ok(parsed.coverageRatio > 0.5)
   assert.ok(parsed.starClauses.length >= 2, '应识别 ★ 实质性条款')
 })

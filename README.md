@@ -1,10 +1,10 @@
 # mont-BidCopilot
 
-> **English summary.** Dual-mode tender & bid drafting engine for DeepSeek Harness. Registers **27 directly callable `mont_*` tools** with code-enforced compliance (T-B1–T-B5), a fact-source allowlist, three human gates backed by a tamper-evident audit chain, score-aligned outlining, dual-threshold similarity checks, and pure-JS `.docx` export. No network access, no subprocesses, no credentials, no install-time scripts. See [SECURITY.md](SECURITY.md) for the full permission table.
+> **English summary.** Dual-mode tender & bid drafting engine for DeepSeek Harness. Registers **32 directly callable `mont_*` tools** with code-enforced compliance (T-B1–T-B5), a fact-source allowlist, three human gates backed by a tamper-evident audit chain, score-aligned outlining, dual-threshold similarity checks, and pure-JS `.docx` export. No network access, no subprocesses, no credentials, no install-time scripts. See [SECURITY.md](SECURITY.md) for the full permission table.
 
 mont-BidCopilot 是招投标双模辅助编制引擎，DeepSeek Harness（DSH）插件。插件在 DSH 界面显示的名字就是 `mont-BidCopilot`，不使用中文别名。
 
-> **它与「技能包」不是一类东西。** 本插件通过 `ctx.tools.register` 注册 **27 个 `mont_*` 真工具**，模型可直接调用；不依赖先加载技能正文再自行拼流程。作为对照，同目录的 `mont-forge` 是 44 个 `SKILL.md` 的技能包，其 `index.js` 只调 `ctx.skills.registerProvider`，没有 `ctx.tools.register`，因此那 44 项不是可自动调用的工具。
+> **它与「技能包」不是一类东西。** 本插件通过 `ctx.tools.register` 注册 **32 个 `mont_*` 真工具**，模型可直接调用；不依赖先加载技能正文再自行拼流程。作为对照，同目录的 `mont-forge` 是 44 个 `SKILL.md` 的技能包，其 `index.js` 只调 `ctx.skills.registerProvider`，没有 `ctx.tools.register`，因此那 44 项不是可自动调用的工具。
 
 ## 权限一览（安装前请先读这张表）
 
@@ -21,7 +21,7 @@ mont-BidCopilot 是招投标双模辅助编制引擎，DeepSeek Harness（DSH）
 | 安装期脚本 | **无。** `package.json` 不含 `preinstall`/`install`/`postinstall` | — |
 | 自动更新 | **无。** 不检查新版本、不发起更新请求 | — |
 
-**关闭插件后的变化：** 27 个工具与 `/bidcopilot-gate` 命令全部移除，所有文件写入停止；已存在的项目目录原样留在磁盘上，不删除。
+**关闭插件后的变化：** 32 个工具与 `/bidcopilot-gate` 命令全部移除，所有文件写入停止；已存在的项目目录原样留在磁盘上，不删除。
 
 **如何在不信任的环境里试用：** 用隔离 profile 或临时 `dataDir`，不要指向含真实企业资料的目录，不要把凭据放进 `dataDir`。
 
@@ -70,7 +70,7 @@ mont-BidCopilot 是招投标双模辅助编制引擎，DeepSeek Harness（DSH）
 
 1. 插件列表出现 `include:mont-bidcopilot`，状态 `fiberPhase` 为 `active`；
 2. 新会话里 `mont_ping` 能调通；
-3. 返回里 `toolCount` 为 `27`。
+3. 返回里 `toolCount` 为 `32`。
 
 在新会话里执行：
 
@@ -84,13 +84,13 @@ mont_ping
 {
   "ok": true,
   "name": "mont-BidCopilot",
-  "toolCount": 27,
+  "toolCount": 32,
   "dshEngineRange": ">=0.2.2-rc.1",
   "storageRoot": "<DSH_HOME>/bidcopilot/projects"
 }
 ```
 
-`toolCount` 不是 27，或 `mont_ping` 调不到，说明没装好——先看第 1 条 `fiberPhase` 状态。
+`toolCount` 不是 32，或 `mont_ping` 调不到，说明没装好——先看第 1 条 `fiberPhase` 状态。
 
 ### 升级
 
@@ -107,7 +107,7 @@ mont_ping
 
 在 **插件** 页找到「mont-BidCopilot」，点卸载即可；也可让 agent 执行卸载。
 
-卸载后 27 个工具与 `/bidcopilot-gate` 命令消失，文件写入停止。**已生成的项目目录保留在磁盘上**，不会删除；如需清理，手动删 `DSH_HOME/bidcopilot/projects` 下的对应目录。
+卸载后 32 个工具与 `/bidcopilot-gate` 命令消失，文件写入停止。**已生成的项目目录保留在磁盘上**，不会删除；如需清理，手动删 `DSH_HOME/bidcopilot/projects` 下的对应目录。
 
 ### 安装故障排查
 
@@ -348,7 +348,7 @@ agent 做不到这一步——`mont_wf_advance` 对 `approve` 会硬拒。**你�
 
 **边界三：不批量、不自动更新、不安装期执行脚本。** 无批量工具、无更新器、`package.json` 无任何 `preinstall`/`install`/`postinstall`。
 
-## 工具清单（27 个）
+## 工具清单（32 个）
 
 ### 项目（3）
 
@@ -390,7 +390,7 @@ agent 做不到这一步——`mont_wf_advance` 对 `approve` 会硬拒。**你�
 
 | 工具 | 职责 |
 |---|---|
-| `mont_bid_parse` | 18 项结构化 + ★实质性条款 + 评分表 |
+| `mont_bid_parse` | 20 项结构化（含标段/阶段）+ ★实质性条款 + 评分表 + 标段清单 |
 | `mont_bid_outline` | 评分对齐目录，按分值权重分配字数，★条款挂章节 |
 | `mont_bid_write_section` | 章节写作，一节一文件，支持续写 |
 | `mont_bid_lock_facts` | 事实锁定与一致性冲突检查 |
@@ -406,6 +406,18 @@ agent 做不到这一步——`mont_wf_advance` 对 `approve` 会硬拒。**你�
 | `mont_bid_rejection_rules` | 列出检查要点数量、按类型与严重度分布、各要点关键词 |
 
 > 概念边界参照招投标公开领域约定：**无效投标**指投标文件被认定无效/否决/不予受理；**废标项**指导致项目废标、重新招标或响应不足的风险。检查为纯规则匹配、无 LLM、无网络；「经验补充项」默认不输出，须显式开启且标注为非原文。
+
+### 结构化检查报告 / 任务进度（5）
+
+| 工具 | 职责 |
+|---|---|
+| `mont_bid_check_report` | 读取导出前结构化检查报告（severity / evidence / suggestion / acknowledged），可逐条复核 |
+| `mont_task_create` | 创建任务进度记录，落在 project.json 的 tasks 数组，跨会话可读 |
+| `mont_task_update` | 更新任务进度或状态（PENDING/RUNNING/SUCCEEDED/FAILED/CANCELED），终态需 force 重启 |
+| `mont_task_list` | 列出任务（可按 kind/status 过滤）并附任务汇总 |
+| `mont_task_status` | 任务汇总：按状态分布、总进度、可恢复任务 id 列表 |
+
+> 导出前检查现产出结构化 `report`：每条阻断项带严重度、证据、修改建议与确认状态；确属误报的项可用 `acknowledged` 确认后放行，但仍保留在报告中。多标段招标文件解析时输出 `lots`，目录按标段生成 `byLot` 分组。任务进度纯文件系统落盘，不启动后台进程。
 
 ### 知识检索（2）
 
@@ -441,7 +453,7 @@ agent 做不到这一步——`mont_wf_advance` 对 `approve` 会硬拒。**你�
 
 2. **Host 服务** —— 已 `ctx.provide('montBidCopilot', ...)`，供同进程的 UI 或其他 Host 插件调用 `approveGate(projectId, input)`。
 
-两条通道使用的 `{ channel: 'host-ui' }` 凭证由插件内部构造，**不出现在任何工具参数中**。因此模型 agent 没有批准通道：27 个 `mont_*` 工具里没有任何 approve/reject/sign 项，`mont_wf_advance` 对这三个动词硬拒（`E_GATE_MODEL_APPROVAL_FORBIDDEN`）。
+两条通道使用的 `{ channel: 'host-ui' }` 凭证由插件内部构造，**不出现在任何工具参数中**。因此模型 agent 没有批准通道：32 个 `mont_*` 工具里没有任何 approve/reject/sign 项，`mont_wf_advance` 对这三个动词硬拒（`E_GATE_MODEL_APPROVAL_FORBIDDEN`）。
 
 **放行前会被挡住的情形**（命令侧同样生效，不只是工具侧）：存在未核验事实 → `E_GATE_UNRESOLVED_ITEMS` 并列出未解决项；同一门重复裁决 → `E_GATE_ALREADY_DECIDED`；拒绝后 → 工作流冻结，`E_WORKFLOW_FROZEN`。
 
