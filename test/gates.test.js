@@ -139,7 +139,8 @@ test('门禁｜工具层不导出任何可构造 Host 凭证的路径', async ()
     const runtime = createRuntime({ root: dir, allowWrite: true })
     registerTools(fakeCtx, runtime)
     await new Promise(resolve => setTimeout(resolve, 50))
-    const approveLike = registered.filter(item => /approve|reject|sign|批准|签署/iu.test(item.name))
+    // 用词边界匹配，避免把 mont_bid_rejection_*（废标检查）误判成批准类工具。
+    const approveLike = registered.filter(item => /(?:^|[_:])(?:approve|reject|sign)(?:$|[_:])|批准|签署/iu.test(item.name))
     assert.deepEqual(approveLike.map(item => item.name), [], '不应存在批准类工具')
     assert.ok(registered.some(item => item.name === 'mont_wf_advance'))
   } finally {
