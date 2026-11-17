@@ -125,8 +125,19 @@ test('元数据｜清单导出并打包了 locale、icon、docs', () => {
   assert.equal(pkg.icon, './icon.svg')
   assert.equal(pkg.exports['./icon'], './icon.svg')
   assert.equal(pkg.exports['./locale/*.json'], './locale/*.json')
-  assert.ok(pkg.files.includes('docs'), 'files 必须含 docs')
+  // docs 逐文件列出（不用裸目录），以便把仅本地留存的文件排除在包外。
+  const docEntries = pkg.files.filter(item => item.startsWith('docs/'))
+  assert.ok(docEntries.length > 0, 'files 必须含 docs 下的条目')
+  for (const required of ['docs/DETAIL.md', 'docs/DETAIL.zh.md', 'docs/preview.svg', 'docs/preview.zh.svg']) {
+    assert.ok(pkg.files.includes(required), `files 必须含 ${required}`)
+  }
   assert.ok(pkg.files.some(item => item.startsWith('locale')), 'files 必须含 locale')
+
+  // 仅本地留存的文档不得进包
+  assert.ok(
+    pkg.files.every(item => !/会话记忆/u.test(item)),
+    '会话记忆文档仅本地留存，不得列入 files',
+  )
 
   // 声明到的每个资源都必须真实存在
   for (const rel of ['icon.svg', 'docs/DETAIL.md', 'docs/DETAIL.zh.md', 'locale/en.json', 'locale/zh.json']) {
