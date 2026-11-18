@@ -21,22 +21,34 @@ const MODE = args.has('--all') ? 'all' : args.has('--staged') ? 'staged' : 'push
 
 /** 敏感模式。name 用于报告，regex 用于匹配。 */
 const PATTERNS = [
+  // ─── 凭据与密钥 ───
   { name: '私钥文件头', regex: /-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----/ },
   { name: 'AWS Access Key', regex: /\bAKIA[0-9A-Z]{16}\b/ },
   { name: 'GitHub Token', regex: /\b(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{36,}\b/ },
   { name: 'GitHub PAT (fine-grained)', regex: /\bgithub_pat_[A-Za-z0-9_]{22,}\b/ },
   { name: 'Gitee Token', regex: /\b(?:gitee|gt)[_-]?[A-Za-z0-9]{32,}\b/i },
   { name: 'npm Token', regex: /\bnpm_[A-Za-z0-9]{36}\b/ },
-  { name: '通用 api key 赋值', regex: /\b(?:api[_-]?key|apikey|secret|token|passwd|password|access[_-]?key)\s*[:=]\s*['"][^'"\s]{12,}['"]/i },
+  { name: '通用 api key 赋值', regex: /\b(?:api[_-]?key|apikey|secret|token|passwd|password|access[_-]?key|private[_-]?key)\s*[:=]\s*['"][^'"\s]{12,}['"]/i },
   { name: 'Bearer Token 硬编码', regex: /Authorization\s*[:=]\s*['"]Bearer\s+[A-Za-z0-9._-]{20,}['"]/i },
   { name: '阿里云/腾讯云 KeyId', regex: /\bLTAI[A-Za-z0-9]{12,}\b/ },
+  { name: 'Slack/Stripe/Google Key', regex: /\b(?:xox[baprs]-[A-Za-z0-9-]{10,}|sk_live_[A-Za-z0-9]{20,}|AIza[A-Za-z0-9_-]{35})\b/ },
+  { name: 'JWT Token', regex: /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/ },
+
+  // ─── 网络与环境 ───
   { name: '内网 IP 地址', regex: /\b(?:10\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])|192\.168)\.\d{1,3}\.\d{1,3}\b/ },
   { name: '本机用户路径', regex: /[A-Za-z]:\\{1,2}Users\\{1,2}[^\\/\s'"]+/i },
-  { name: '私密邮箱批量', regex: null, skip: true },
+  { name: 'Unix 家目录路径', regex: /(?:^|[\s'"`])\/(?:home|Users)\/[a-zA-Z0-9._-]+\//m },
+  { name: '内网主机名/端口', regex: /\b[a-z0-9-]+\.(?:local|internal|lan|corp)\b/i },
+
+  // ─── 个人身份信息（用户隐私）───
+  { name: '中国大陆手机号', regex: /(?<!\d)1[3-9]\d{9}(?!\d)/ },
+  { name: '中国大陆身份证号', regex: /(?<!\d)[1-9]\d{5}(?:19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[\dXx](?!\d)/ },
+  { name: '真实邮箱地址', regex: /\b[A-Za-z0-9._%+-]+@(?!users\.noreply\.github\.com|example\.(?:com|org)|test\.(?:com|org))[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/ },
+  { name: '银行卡号', regex: /(?<!\d)(?:62|4\d|5[1-5])\d{14,17}(?!\d)/ },
 ];
 
 /** 允许清单：示例值、占位符、明显假值。 */
-const ALLOW = /(?:your[_-]?|<[^>]*>|xxx+|\*\*\*|example|placeholder|redacted|\.\.\.|TODO|CHANGEME)/i;
+const ALLOW = /(?:your[_-]?|<[^>]*>|xxx+|\*\*\*|example|placeholder|redacted|\.\.\.|TODO|CHANGEME|noreply\.github\.com|@example\.|@test\.)/i;
 
 /** 收集待扫描内容，返回 [{ label, text }]。 */
 function collectBlobs() {

@@ -1,0 +1,5 @@
+#!/bin/sh
+# post-commit 钩子：提交后自动脱敏扫描并推送到 gitee / origin。
+# 逻辑在 scripts/autopush.js，这里只负责调用；任何失败都不阻断 git commit。
+node "$(git rev-parse --show-toplevel)/scripts/autopush.js" || true
+exit 0

@@ -55,7 +55,8 @@
     "pack:check": "npm pack --dry-run",
     "prescan": "node scripts/prescan.js --all",
     "push:gitee": "node scripts/push.js gitee master",
-    "push:github": "node scripts/push.js origin master"
+    "push:github": "node scripts/push.js origin master",
+    "install-hooks": "node scripts/install-hooks.js"
   },
   "keywords": [
     "dsh-plugin",
