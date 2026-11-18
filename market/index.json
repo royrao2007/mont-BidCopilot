@@ -77,7 +77,7 @@
       },
       "versions": [
         {
-          "version": "0.4.0",
+          "version": "0.4.3",
           "publishTimestamp": 1794550366,
           "source": {
             "type": "npm"
@@ -90,5 +90,5 @@
       "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJtb250LUJpZENvcGlsb3QiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzJmNmZlZCIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxYjNmYTgiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjE0IiBmaWxsPSJ1cmwoI2cpIi8+CiAgPHBhdGggZD0iTTE4IDE0aDIwbDEwIDEwdjI2YTIgMiAwIDAgMS0yIDJIMThhMiAyIDAgMCAxLTItMlYxNmEyIDIgMCAwIDEgMi0yeiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC45NSIvPgogIDxwYXRoIGQ9Ik0zOCAxNHY4YTIgMiAwIDAgMCAyIDJoOCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWIzZmE4IiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0yMyAzMGgxOE0yMyAzN2gxOE0yMyA0NGgxMSIgc3Ryb2tlPSIjMmY2ZmVkIiBzdHJva2Utd2lkdGg9IjIuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iNDYiIGN5PSI0NyIgcj0iOSIgZmlsbD0iIzBmOWQ1OCIvPgogIDxwYXRoIGQ9Ik00MiA0Ny4ybDIuOCAyLjkgNS01LjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyLjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K"
     }
   ],
-  "version": "0.4.1"
+  "version": "0.4.3"
 }
