@@ -2,11 +2,21 @@
 # 不属于包内容（package.json#files 不含 node_modules），也不应提交。
 node_modules/
 
+# ─── 推送范围规则：说明性文档可推，内部开发文档与会话文档不推 ───
+# 可推（不要加进来）：README.md、CHANGELOG.md、NOTICE.md、SECURITY.md、
+#   DISTRIBUTION.md、docs/DETAIL*.md —— 这些是对外说明性文档。
+# 不推：内部开发文档、会话记忆、工作留痕、实施方案。
+
 # 内部实施方案文档：仅本地留存，不进仓库也不进 npm 包。
 mont-BidCopilot实施方案.md
 
-# 会话记忆文档：本地工作留痕，不进仓库也不进 npm 包。
+# 会话记忆 / 工作留痕文档：不进仓库也不进 npm 包。
 docs/会话记忆-*.md
+docs/*-会话*.md
+docs/*开发文档*.md
+docs/*实施方案*.md
+docs/internal/
+docs/_draft/
 
 # 测试与调试产物
 *.tmp

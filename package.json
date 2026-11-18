@@ -52,7 +52,10 @@
   },
   "scripts": {
     "test": "node --test \"test/*.test.js\"",
-    "pack:check": "npm pack --dry-run"
+    "pack:check": "npm pack --dry-run",
+    "prescan": "node scripts/prescan.js --all",
+    "push:gitee": "node scripts/push.js gitee master",
+    "push:github": "node scripts/push.js origin master"
   },
   "keywords": [
     "dsh-plugin",
