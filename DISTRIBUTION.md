@@ -1,4 +1,4 @@
-﻿# 分发与收录状态
+# 分发与收录状态
 
 本文件记录 mont-BidCopilot 在各渠道的发布与收录进度，便于持续跟进。
 
@@ -9,7 +9,7 @@
 | 项 | 值 |
 |---|---|
 | npm 包名 | `dsh-mont-bidcopilot` |
-| latest 版本 | **0.4.3** |
+| latest 版本 | **0.5.0** |
 | GitHub 仓库 | <https://github.com/royrao2007/mont-BidCopilot> |
 | 许可证 | MIT |
 

@@ -33,8 +33,8 @@ mont-BidCopilot 是招投标双模辅助编制引擎，DeepSeek Harness（DSH）
 
 | 项 | 要求 | 检查命令 |
 |---|---|---|
-| DSH | `>=0.2.2-rc.1` | 插件页右下角版本号，或 `dsh --version` |
-| Node.js | `>=22.5.0` | `node -v` |
+| DSH | `>=0.2.2-rc.5` | 插件页右下角版本号，或 `dsh --version` |
+| Node.js | `>=24.9.0` | `node -v` |
 | 第三方依赖 | **无需安装**（运行时零依赖） | — |
 
 ### 方式一：图形界面安装（推荐）
@@ -85,7 +85,7 @@ mont_ping
   "ok": true,
   "name": "mont-BidCopilot",
   "toolCount": 32,
-  "dshEngineRange": ">=0.2.2-rc.1",
+  "dshEngineRange": ">=0.2.2-rc.5",
   "storageRoot": "<DSH_HOME>/bidcopilot/projects"
 }
 ```
@@ -525,7 +525,8 @@ node --test 'test/*.test.js'
 | 合规不可绕过 | `test/compliance.test.js` | T-B1~T-B5 各含命中与未命中用例、来源注入被拒、雷同阈值独立、无批量入口 |
 | 门禁不可绕过 | `test/gates.test.js` | 未批准不推进、伪造凭证被拒、模型无批准通道、UNVERIFIED 阻断导出、审计链防篡改、拒绝即冻结 |
 | 门禁人机通道 | `test/gate-channel.test.js` | 工具面无批准项、`/bidcopilot-gate` 可写审计链、未解决项挡放行、拒绝冻结、重复裁决被拒、缺参数给用法 |
-| 清单与版本契约 | `test/manifest.test.js` | `engines.dsh >=0.2.2-rc.1` 且运行时落在范围内、无安装期脚本、零依赖、ping 数量如实、schema 合规 |
+| 清单与版本契约 | `test/manifest.test.js` | `engines.dsh >=0.2.2-rc.5` 且运行时落在范围内、无安装期脚本、零依赖、ping 数量如实、schema 合规 |
+| 步骤准入适配 | `test/conditional-tools.test.js` | 只读模式下 14 个写工具被 `when` 摘除、读工具保留、注册数恒 32、条件同步返回布尔、Config 丢弃未知键 |
 | 包元数据与权限披露 | `test/metadata.test.js` | en/zh locale 三字段齐备、描述含权限信息、英文纯英文、detail 单行图片、SVG 无脚本/文本/远程引用、README 首屏权限表 |
 
 ## 已知限制与未实现项

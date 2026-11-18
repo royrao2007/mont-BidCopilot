@@ -72,6 +72,11 @@ function buildConfigSchema() {
   }
 
   // 尝试用宿主 schemastery 构造真 schema（给设置页提供完整元信息）。
+  //
+  // 注意：schemastery 的 `~standard.validate` 会保留未知键（它只补默认值与校验类型，
+  // 不做白名单裁剪）。插件契约要求丢弃未知键——否则拼错的配置键会被静默接受、
+  // 用户以为改了实际没生效。因此这里保留 schema 实例用于元信息展示，但把 validate
+  // 包一层：先过 schemastery 拿默认值与类型错误，再按白名单裁剪。
   try {
     const S = hostSchemastery()
     if (S !== undefined) {
@@ -82,7 +87,25 @@ function buildConfigSchema() {
         collusionThreshold: S.number().default(0.65).description('围标相似度阈值。'),
         kbDir: S.string().default('').description('企业资料目录，供 mont_kb_search 检索。'),
       })
-      if (schema?.['~standard']?.validate !== undefined) return schema
+      const inner = schema?.['~standard']
+      if (inner?.validate !== undefined) {
+        return {
+          ...schema,
+          ['~standard']: {
+            ...inner,
+            /** 先由 schemastery 校验并补默认值，再按白名单裁剪掉未知键。 */
+            validate(value) {
+              const result = inner.validate(value)
+              if (result.issues !== undefined) return result
+              const picked = {}
+              for (const [key, , fallback] of specs) {
+                picked[key] = result.value?.[key] ?? fallback
+              }
+              return { value: picked }
+            },
+          },
+        }
+      }
     }
   } catch {
     // 取不到宿主库时走下面的等价实现。

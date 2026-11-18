@@ -399,8 +399,8 @@ test('元数据｜package.json 保持零依赖、无安装期脚本、声明 eng
   for (const key of ['preinstall', 'install', 'postinstall']) {
     assert.equal(pkg.scripts?.[key], undefined, `不得声明 ${key}`)
   }
-  assert.equal(pkg.engines.dsh, '>=0.2.2-rc.1')
-  assert.match(pkg.engines.node, /^>=22\.5\.0$/u)
+  assert.equal(pkg.engines.dsh, '>=0.2.2-rc.5')
+  assert.match(pkg.engines.node, /^>=24\.9\.0$/u, 'DSH 0.2.1-rc.2 起要求 Node 24.9+')
 })
 
 test('元数据｜顶层 description 为英文且与 locale 主张一致（不含未实现能力）', () => {

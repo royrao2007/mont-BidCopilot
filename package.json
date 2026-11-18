@@ -1,7 +1,7 @@
 {
   "name": "dsh-mont-bidcopilot",
-  "version": "0.4.3",
-  "description": "Dual-mode tender and bid drafting engine for DeepSeek Harness. Registers 32 directly callable mont_* tools with code-enforced compliance rules (T-B1 to T-B5), an offline Chinese policy library for clause grounding, a fact-source allowlist, three human gates with a tamper-evident audit chain, score-aligned outlining, dual-threshold similarity checks, and pure-JS .docx export. No network access, no subprocesses, no install-time scripts.",
+  "version": "0.5.0",
+  "description": "Dual-mode tender and bid drafting engine for DeepSeek Harness. Registers 32 directly callable mont_* tools with code-enforced compliance rules (T-B1 to T-B5), an offline Chinese policy library for clause grounding, a fact-source allowlist, three human gates with a tamper-evident audit chain, score-aligned outlining, dual-threshold similarity checks, and pure-JS .docx export. Write tools honour DSH step admission: under allowWrite=false they leave the model's tool set instead of failing a round. No network access, no subprocesses, no install-time scripts.",
   "license": "MIT",
   "author": {
     "name": "mont",
@@ -16,8 +16,8 @@
   "main": "index.js",
   "icon": "./icon.svg",
   "engines": {
-    "node": ">=22.5.0",
-    "dsh": ">=0.2.2-rc.1"
+    "node": ">=24.9.0",
+    "dsh": ">=0.2.2-rc.5"
   },
   "exports": {
     ".": "./index.js",
@@ -71,7 +71,7 @@
     "chinese"
   ],
   "peerDependencies": {
-    "@deepseek-ai/cordis": ">=4.0.1 <5.0.0"
+    "@deepseek-ai/cordis": ">=4.1.0 <5.0.0"
   },
   "peerDependenciesMeta": {
     "@deepseek-ai/cordis": {

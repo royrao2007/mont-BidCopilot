@@ -1,3 +1,40 @@
+## 0.5.0 — 2026-11-18
+
+适配 DeepSeek Harness 0.2.2-rc.5 的插件机制。基线核对：DSH 0.2.2-rc.5、`@deepseek-ai/cordis` 4.1.0、`@deepseek-ai/schemastery` 3.19.0、Node 24.21.0。
+
+### ① 写工具接入步骤准入（`ToolRegistrationOptions.when`）
+
+`ctx.tools.register(definition, { when })` 在每个模型步骤装配前求值一次，返回 false 的工具不出现在该步骤的工具声明、PTC 绑定与派发中。
+
+14 个会产生磁盘写入的工具（`mont_project_create`、`mont_guard_verify_fact`、`mont_tender_parse`、`mont_tender_draft_section`、`mont_bid_parse`、`mont_bid_outline`、`mont_bid_write_section`、`mont_bid_lock_facts`、`mont_bid_export`、`mont_bid_rejection_check`、`mont_task_create`、`mont_task_update`、`mont_kb_index`、`mont_wf_advance`）现在挂上只读准入条件。
+
+`allowWrite: false` 时它们**直接从模型可见工具集里消失**，而不是等模型调用后才返回 `E_READONLY`——省掉一轮无效往返，也不会让模型误判"工具坏了"。执行层的 `E_READONLY` 兜底保留。
+
+判定依据是 `store.js` 里以 `assertWritable` 守卫的五个写方法（`createProject` / `updateProject` / `writeSection` / `writeTenderSource` / `writeExport`），以及经它们落盘的 `saveWorkflow`。纯读工具一律不挂条件——被摘掉的工具会连带丢失声明，模型就找不到它了。
+
+条件为纯同步布尔，无 I/O、不响应取消、不抛错：宿主把条件抛错当作 `TOOL_ACTIVATION_FAILED` 处理，会让整个步骤失败。
+
+### ② `ping` 报告的引擎范围改为读清单
+
+`dshEngineRange` 原先硬编码 `>=0.2.2-rc.1`，与 `package.json` 的 `engines.dsh` 各自维护、必然漂移（与 0.1.x 时代 ping 报 `0.1.0` 而包已是 `0.1.3` 是同类缺陷）。现统一从 `package.json#engines.dsh` 读取，单一事实源。
+
+### ③ 引擎与运行时基线对齐
+
+- `engines.dsh`：`>=0.2.2-rc.1` → `>=0.2.2-rc.5`（本节用到的 `when` 需要该版本起的步骤准入机制）
+- `engines.node`：`>=22.5.0` → `>=24.9.0`（DSH 0.2.1-rc.2 起不再支持 Node 22）
+- `peerDependencies["@deepseek-ai/cordis"]`：`>=4.0.1` → `>=4.1.0`
+
+宿主自 0.2.1-alpha.3 起优先读 `engines.dsh` 判兼容，本包的声明因此就是兼容性判据本身。
+
+### 测试
+
+新增 `test/conditional-tools.test.js`（5 例）：只读模式下写工具条件求值为 false、可写模式下为 true、注册数量恒为 32（条件只在步骤装配时摘除，不影响注册）、条件同步返回布尔、`runtime.canWrite()` 与 `store.allowWrite` 口径一致。
+
+用例做了红证：把 `writable` 临时改成恒 `true`，只读用例确实失败；还原后 SHA-256 逐字节一致。
+
+全量 221 例通过（原 216 + 新增 5）。
+
+
 ## 0.4.3 — 2026-11-18
 
 新增 `docs/会话记忆-2026-11.md`：记录本轮从招标文件起草到插件市场收录的完整工作链路，

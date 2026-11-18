@@ -60,7 +60,7 @@ function compareVersions(a, b) {
   return 0
 }
 
-test('版本｜package.json 声明 dsh engines 且不低于 0.2.2-rc.1', async () => {
+test('版本｜package.json 声明 dsh engines 且不低于 0.2.2-rc.5', async () => {
   const pkg = JSON.parse(await readFile(PKG_PATH, 'utf8'))
   assert.ok(pkg.engines !== undefined, 'package.json 必须有 engines 字段')
   assert.ok(typeof pkg.engines.dsh === 'string', 'engines.dsh 必须声明')
@@ -71,10 +71,10 @@ test('版本｜package.json 声明 dsh engines 且不低于 0.2.2-rc.1', async (
   const floor = parseVersion(range.replace(/^>=/u, '').trim())
   assert.ok(floor !== null, `无法解析下限版本：${range}`)
 
-  const required = parseVersion('0.2.2-rc.1')
+  const required = parseVersion('0.2.2-rc.5')
   assert.ok(
     compareVersions(floor, required) >= 0,
-    `engines.dsh 下限 ${range} 低于要求 0.2.2-rc.1`,
+    `engines.dsh 下限 ${range} 低于要求 0.2.2-rc.5（本节用到了该版本起的 when 步骤准入）`,
   )
 })
 
@@ -213,7 +213,8 @@ test('清单｜mont_ping 如实报告工具数量与清单一致', async () => {
     assert.equal(ping.toolCount, names.length, 'ping 报的数量必须与实际注册数一致')
     assert.deepEqual(ping.tools, names, 'ping 报的清单必须与实际注册清单一致')
     assert.ok(ping.toolCount >= 20, `工具数应覆盖全部能力，实际 ${ping.toolCount}`)
-    assert.equal(ping.dshEngineRange, '>=0.2.2-rc.1')
+    assert.equal(ping.dshEngineRange, JSON.parse(await readFile(PKG_PATH, 'utf8')).engines.dsh,
+      'ping 报的引擎范围必须与 package.json 的 engines.dsh 一致（单一事实源）')
   } finally {
     await rm(dir, { recursive: true, force: true })
   }
